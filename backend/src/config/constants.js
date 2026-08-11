@@ -1,0 +1,21 @@
+module.exports = {
+  APP_NAME: "CSE(AIML) Student Monitoring System",
+  API_PREFIX: "/api/v1",
+  ROLES: {
+    STUDENT: "STUDENT",
+    ADMIN: "ADMIN",
+  },
+  EVENT_TYPES: {
+    HACKATHON: "HACKATHON",
+    INTERNSHIP: "INTERNSHIP",
+    COURSE: "COURSE",
+  },
+  COMPLETION_STATUS: {
+    PENDING: "PENDING",
+    COMPLETED: "COMPLETED",
+    NOT_COMPLETED: "NOT_COMPLETED",
+  },
+  OTP_EXPIRY_MINUTES: 10,
+  MAX_DOWNLOAD_SIZE_MB: 10,
+  UPLOAD_DIR: "uploads",
+};

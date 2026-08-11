@@ -1,0 +1,119 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-dark-900 text-white antialiased;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-bold;
+  }
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    @apply bg-dark-800;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-primary-600 rounded-full;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-primary-500;
+  }
+}
+
+@layer components {
+  .glass-card {
+    @apply bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl;
+  }
+  .event-card {
+    @apply glass-card p-6 flex flex-col;
+  }
+  .btn-primary {
+    @apply inline-flex items-center justify-center px-5 py-2.5 text-sm font-semibold text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-all duration-200 shadow-glow hover:shadow-glow-sm focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-2 focus:ring-offset-dark-900;
+  }
+  .btn-secondary {
+    @apply inline-flex items-center justify-center px-5 py-2.5 text-sm font-semibold text-white bg-secondary-600 hover:bg-secondary-700 rounded-lg transition-all duration-200 shadow-glow-blue hover:shadow-glow-sm focus:outline-none focus:ring-2 focus:ring-secondary-400 focus:ring-offset-2 focus:ring-offset-dark-900;
+  }
+  .btn-danger {
+    @apply inline-flex items-center justify-center px-5 py-2.5 text-sm font-semibold text-white bg-red-500 hover:bg-red-600 rounded-lg transition-all duration-200 shadow-glow-red hover:shadow-glow-sm focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-2 focus:ring-offset-dark-900;
+  }
+  .input-dark {
+    @apply w-full px-4 py-2.5 text-white bg-dark-800 border border-dark-600 rounded-lg focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 transition-colors;
+  }
+  .label-dark {
+    @apply block text-sm font-medium text-dark-300 mb-1.5;
+  }
+}
+
+/* ── Card sizing & spacing ─────────────────── */
+
+/* Thumbnail – always landscape 16:9 */
+.thumbnail-landscape {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-radius: 0.5rem;
+}
+
+/* Bigger cards */
+.big-card {
+  padding: 2rem;
+}
+
+/* Countdown box – landscape, larger */
+.countdown-box {
+  min-height: 140px;
+  min-width: 240px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 1rem;
+  padding: 1.5rem 2.5rem;
+}
+
+.countdown-box .time-label {
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #a1a1aa;
+  margin-bottom: 0.5rem;
+}
+
+.countdown-box .time-value {
+  font-size: 3.5rem;
+  line-height: 1;
+  font-weight: 800;
+  font-family: "JetBrains Mono", monospace;
+  color: #4ade80; /* green */
+  text-shadow: 0 0 20px rgba(74, 222, 128, 0.3);
+}
+
+/* Challenge card – full width, comfortable padding */
+.challenge-card {
+  width: 100%;
+  min-width: 0;
+  padding: 2rem;
+  box-sizing: border-box;
+}
+
+@media (min-width: 768px) {
+  .challenge-card .grid {
+    grid-template-columns: 1.2fr 1fr;
+  }
+}
+
+/* Card image wrapper – fixed landscape height */
+.card-image-wrapper {
+  @apply overflow-hidden rounded-lg mb-4;
+  aspect-ratio: 16 / 9;
+}
+
+.card-image {
+  @apply w-full h-full object-cover;
+}

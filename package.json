@@ -1,0 +1,16 @@
+{
+  "name": "cse-aiml-student-monitoring",
+  "version": "1.0.0",
+  "description": "CSE(AIML) Student Monitoring System – full-stack app",
+  "scripts": {
+    "install-all": "npm --prefix backend install && npm --prefix frontend install",
+    "dev": "concurrently \"npm run dev --prefix backend\" \"npm run dev --prefix frontend\"",
+    "backend": "npm run dev --prefix backend",
+    "frontend": "npm run dev --prefix frontend",
+    "seed": "npm run seed --prefix backend",
+    "migrate": "npm run prisma:migrate --prefix backend"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
