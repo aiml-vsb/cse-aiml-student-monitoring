@@ -1,27 +1,32 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
-import { Users, Trophy, Briefcase, GraduationCap, Code2, AlertTriangle, Loader } from "lucide-react";
+import { Users, Trophy, Briefcase, GraduationCap, Code2, AlertTriangle, Loader, FileText } from "lucide-react";
 import api from "../../api/client";
 import endpoints from "../../api/endpoints";
 import GlowCard from "../common/GlowCard";
+
+const STATS_REFRESH_MS = 60_000;
 
 export default function AdminOverview() {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchStats = async () => {
-      try {
-        const { data } = await api.get(endpoints.adminStats);
-        setStats(data.data);
-      } catch (err) {
-        console.error("Failed to load stats", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchStats();
+  const fetchStats = useCallback(async () => {
+    try {
+      const { data } = await api.get(endpoints.adminStats);
+      setStats(data.data);
+    } catch (err) {
+      console.error("Failed to load stats", err);
+    } finally {
+      setLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    fetchStats();
+    const interval = setInterval(fetchStats, STATS_REFRESH_MS);
+    return () => clearInterval(interval);
+  }, [fetchStats]);
 
   if (loading) {
     return <Loader className="w-8 h-8 animate-spin text-primary-400 mx-auto my-12" />;
@@ -31,9 +36,10 @@ export default function AdminOverview() {
 
   const cards = [
     { label: "Total Students", value: stats.totalStudents, icon: Users, glow: "blue" },
-    { label: "Hackathons", value: stats.totalHackathons, icon: Trophy, glow: "blue" },
-    { label: "Internships", value: stats.totalInternships, icon: Briefcase, glow: "green" },
-    { label: "Courses", value: stats.totalCourses, icon: GraduationCap, glow: "primary" },
+    { label: "Active Hackathons", value: stats.totalHackathons, icon: Trophy, glow: "blue" },
+    { label: "Active Internships", value: stats.totalInternships, icon: Briefcase, glow: "green" },
+    { label: "Active Courses", value: stats.totalCourses, icon: GraduationCap, glow: "primary" },
+    { label: "Active Tasks", value: stats.totalTasks, icon: FileText, glow: "blue" },
     { label: "Challenges Completed", value: stats.totalCompletions, icon: Code2, glow: "green" },
     { label: "Impositions", value: stats.totalImpositions, icon: AlertTriangle, glow: "red" },
   ];

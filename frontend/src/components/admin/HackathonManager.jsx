@@ -39,6 +39,8 @@ export default function HackathonManager() {
 
   useEffect(() => {
     fetchHackathons();
+    const interval = setInterval(fetchHackathons, 60_000);
+    return () => clearInterval(interval);
   }, []);
 
   const handleChange = (e) => {

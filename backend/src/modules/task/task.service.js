@@ -1,5 +1,6 @@
 const prisma = require("../../lib/prisma");
 const ApiError = require("../../utils/api-error");
+const { activeTaskWhere } = require("../../utils/active-filters");
 
 /**
  * Auto-mark missed tasks and create impositions.
@@ -89,7 +90,9 @@ const createTask = async (adminId, data) => {
 
 const getAllTasks = async () => {
   await reconcileMissedTasks();
+  const now = new Date();
   return prisma.task.findMany({
+    where: activeTaskWhere(now),
     orderBy: { createdAt: "desc" },
     include: { completions: true },
   });

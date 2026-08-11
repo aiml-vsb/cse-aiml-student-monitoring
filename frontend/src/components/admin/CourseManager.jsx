@@ -38,6 +38,8 @@ export default function CourseManager() {
 
   useEffect(() => {
     fetchCourses();
+    const interval = setInterval(fetchCourses, 60_000);
+    return () => clearInterval(interval);
   }, []);
 
   const handleChange = (e) => {

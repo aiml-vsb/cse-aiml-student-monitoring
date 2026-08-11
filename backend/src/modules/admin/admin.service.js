@@ -2,6 +2,12 @@ const bcrypt = require("bcryptjs");
 const prisma = require("../../lib/prisma");
 const ApiError = require("../../utils/api-error");
 const { ADMIN_EMAIL } = require("../../config/env");
+const {
+  activeHackathonWhere,
+  activeInternshipWhere,
+  activeCourseWhere,
+  activeTaskWhere,
+} = require("../../utils/active-filters");
 
 const DEFAULT_ADMIN_EMAIL = ADMIN_EMAIL;
 
@@ -60,6 +66,8 @@ const deleteAdmin = async (adminId) => {
 };
 
 const getAdminStats = async () => {
+  const now = new Date();
+
   const [
     totalStudents,
     totalAdmins,
@@ -73,13 +81,13 @@ const getAdminStats = async () => {
   ] = await Promise.all([
     prisma.user.count({ where: { role: "STUDENT" } }),
     prisma.user.count({ where: { role: "ADMIN" } }),
-    prisma.hackathon.count(),
-    prisma.internship.count(),
-    prisma.course.count(),
+    prisma.hackathon.count({ where: activeHackathonWhere(now) }),
+    prisma.internship.count({ where: activeInternshipWhere(now) }),
+    prisma.course.count({ where: activeCourseWhere(now) }),
     prisma.imposition.count(),
     prisma.completion.count({ where: { status: "COMPLETED" } }),
     prisma.registration.count(),
-    prisma.task.count(),
+    prisma.task.count({ where: activeTaskWhere(now) }),
   ]);
 
   return {

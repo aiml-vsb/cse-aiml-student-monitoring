@@ -40,6 +40,8 @@ export default function InternshipManager() {
 
   useEffect(() => {
     fetchInternships();
+    const interval = setInterval(fetchInternships, 60_000);
+    return () => clearInterval(interval);
   }, []);
 
   const handleChange = (e) => {

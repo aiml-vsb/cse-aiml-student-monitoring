@@ -35,7 +35,11 @@ export default function TaskManager() {
     }
   };
 
-  useEffect(() => { fetchTasks(); }, []);
+  useEffect(() => {
+    fetchTasks();
+    const interval = setInterval(fetchTasks, 60_000);
+    return () => clearInterval(interval);
+  }, []);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -137,11 +141,11 @@ export default function TaskManager() {
       )}
 
       <div className="glass-card p-6">
-        <h2 className="text-xl font-bold text-white mb-4">All Tasks ({tasks.length})</h2>
+        <h2 className="text-xl font-bold text-white mb-4">Active Tasks ({tasks.length})</h2>
         {loading ? (
           <div className="flex justify-center py-8"><Loader className="w-8 h-8 animate-spin text-primary-400" /></div>
         ) : tasks.length === 0 ? (
-          <p className="text-center text-dark-400 py-8">No tasks created</p>
+          <p className="text-center text-dark-400 py-8">No active tasks</p>
         ) : (
           <div className="grid md:grid-cols-2 gap-4">
             {tasks.map((task) => (
