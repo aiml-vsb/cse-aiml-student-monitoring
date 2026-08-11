@@ -67,9 +67,10 @@ export default function Login() {
     }
   };
 
-  const handleGoogleLogin = () => {
-    window.location.href = `${import.meta.env.VITE_API_BASE_URL}/auth/google`;
-  };
+const handleGoogleLogin = () => {
+  const apiBase = import.meta.env.VITE_API_URL || "http://localhost:5000";
+  window.location.href = `${apiBase}/api/v1/auth/google`;
+};
 
   return (
     <div className="min-h-screen flex items-center justify-center relative">
