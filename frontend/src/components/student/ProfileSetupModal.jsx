@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { User, Calendar, Code2, Github, Save, Loader } from "lucide-react";
 import api from "../../api/client";
@@ -44,6 +44,7 @@ const extractGithubUsername = (input) => {
 };
 
 export default function ProfileSetupModal({ onClose }) {
+  const STORAGE_KEY = "profileSetupFormData";
   const [formData, setFormData] = useState({
     username: "",
     year: "",
@@ -54,22 +55,63 @@ export default function ProfileSetupModal({ onClose }) {
   const { user, updateUser } = useAuth();
   const toast = useToast();
 
+  useEffect(() => {
+    const stored = sessionStorage.getItem(STORAGE_KEY);
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored);
+        if (parsed && typeof parsed === "object") {
+          setFormData((prev) => ({
+            username: parsed.username || prev.username || user?.username || "",
+            year: parsed.year || prev.year || user?.year || "",
+            leetcodeUsername: parsed.leetcodeUsername || prev.leetcodeUsername || user?.leetcodeUsername || "",
+            githubUsername: parsed.githubUsername || prev.githubUsername || user?.githubUsername || "",
+          }));
+          return;
+        }
+      } catch (err) {
+        console.warn("Failed to restore profile setup state", err);
+      }
+    }
+
+    if (user) {
+      setFormData((prev) => ({
+        username: prev.username || user.username || "",
+        year: prev.year || user.year || "",
+        leetcodeUsername: prev.leetcodeUsername || user.leetcodeUsername || "",
+        githubUsername: prev.githubUsername || user.githubUsername || "",
+      }));
+    }
+  }, [user]);
+
+  const persistFormData = (data) => {
+    try {
+      sessionStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    } catch (err) {
+      console.warn("Unable to persist profile setup state", err);
+    }
+  };
+
+  const clearSavedFormData = () => {
+    sessionStorage.removeItem(STORAGE_KEY);
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
 
-    if (name === "leetcodeUsername") {
-      setFormData((prev) => ({
+    setFormData((prev) => {
+      const nextData = {
         ...prev,
-        leetcodeUsername: extractLeetCodeUsername(value),
-      }));
-    } else if (name === "githubUsername") {
-      setFormData((prev) => ({
-        ...prev,
-        githubUsername: extractGithubUsername(value),
-      }));
-    } else {
-      setFormData({ ...formData, [name]: value });
-    }
+        [name]:
+          name === "leetcodeUsername"
+            ? extractLeetCodeUsername(value)
+            : name === "githubUsername"
+            ? extractGithubUsername(value)
+            : value,
+      };
+      persistFormData(nextData);
+      return nextData;
+    });
   };
 
   const handleSubmit = async (e) => {
@@ -83,6 +125,7 @@ export default function ProfileSetupModal({ onClose }) {
         githubUsername: formData.githubUsername,
       });
       updateUser(data.data);
+      clearSavedFormData();
       toast.success("Profile completed!");
       onClose();
     } catch (err) {
@@ -94,6 +137,7 @@ export default function ProfileSetupModal({ onClose }) {
 
   const handleGithubLink = async () => {
     setSaving(true);
+    persistFormData(formData);
     try {
       const { data } = await api.get(endpoints.githubUrl);
       window.location.href = data.data.url;

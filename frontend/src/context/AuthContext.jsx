@@ -10,13 +10,15 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   const fetchMe = useCallback(async () => {
-    if (!token) {
+    const storedToken = localStorage.getItem("token");
+    if (!storedToken) {
       setUser(null);
       setLoading(false);
       return;
     }
 
     try {
+      setToken(storedToken);
       const { data } = await api.get(endpoints.me);
       setUser(data.data);
     } catch (err) {
@@ -27,7 +29,7 @@ export function AuthProvider({ children }) {
     } finally {
       setLoading(false);
     }
-  }, [token]);
+  }, []);
 
   useEffect(() => {
     fetchMe();
@@ -128,6 +130,7 @@ export function AuthProvider({ children }) {
     adminLogin,
     logout,
     updateUser,
+    refreshUser: fetchMe,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

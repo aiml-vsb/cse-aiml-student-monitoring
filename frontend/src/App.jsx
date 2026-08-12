@@ -38,6 +38,7 @@ function ProtectedRoute({ children, allowedRoles }) {
 export default function App() {
   const location = useLocation();
   const toast = useToast();
+  const { refreshUser } = useAuth();
 
   // Handle OAuth callback query params
   useEffect(() => {
@@ -49,14 +50,14 @@ export default function App() {
     if (token) {
       localStorage.setItem("token", token);
       window.history.replaceState({}, "", "/student");
-      window.location.reload();
+      refreshUser().catch(() => {});
       return;
     }
 
     if (githubLinked === "linked") {
       toast.success("GitHub linked successfully!");
       window.history.replaceState({}, "", "/student");
-      window.location.reload();
+      refreshUser().catch(() => {});
       return;
     }
 
