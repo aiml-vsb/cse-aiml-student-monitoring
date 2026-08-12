@@ -7,18 +7,12 @@ const ApiError = require("../utils/api-error");
  * All DB queries are done here, so the function takes no arguments.
  */
 const generateStudentsExcel = async () => {
-  // Single query to get all students with their relations
+  // Fetch students plus basic relations; registrations do not directly include event objects.
   const students = await prisma.user.findMany({
     where: { role: "STUDENT" },
     include: {
       dailyCompletions: { select: { status: true } },
-      registrations: {
-        include: {
-          hackathon: { select: { title: true } },
-          internship: { select: { title: true } },
-          course: { select: { title: true } },
-        },
-      },
+      registrations: true,
       impositions: { select: { reason: true, imposedAt: true } },
     },
   });
@@ -26,6 +20,37 @@ const generateStudentsExcel = async () => {
   if (!students || students.length === 0) {
     throw new ApiError(404, "No students found");
   }
+
+  const hackathonIds = [];
+  const internshipIds = [];
+  const courseIds = [];
+
+  students.forEach((student) => {
+    student.registrations.forEach((reg) => {
+      if (reg.eventType === "HACKATHON") hackathonIds.push(reg.eventId);
+      if (reg.eventType === "INTERNSHIP") internshipIds.push(reg.eventId);
+      if (reg.eventType === "COURSE") courseIds.push(reg.eventId);
+    });
+  });
+
+  const uniqueIds = (ids) => [...new Set(ids)];
+  const [hackathons, internships, courses] = await Promise.all([
+    uniqueIds(hackathonIds).length
+      ? prisma.hackathon.findMany({ where: { id: { in: uniqueIds(hackathonIds) } } })
+      : [],
+    uniqueIds(internshipIds).length
+      ? prisma.internship.findMany({ where: { id: { in: uniqueIds(internshipIds) } } })
+      : [],
+    uniqueIds(courseIds).length
+      ? prisma.course.findMany({ where: { id: { in: uniqueIds(courseIds) } } })
+      : [],
+  ]);
+
+  const eventMap = new Map([
+    ...hackathons.map((h) => [h.id, h.title]),
+    ...internships.map((i) => [i.id, i.title]),
+    ...courses.map((c) => [c.id, c.title]),
+  ]);
 
   const workbook = new ExcelJS.Workbook();
   workbook.creator = "CSE(AIML) Student Monitoring System";
@@ -83,7 +108,7 @@ const generateStudentsExcel = async () => {
       .forEach((r) => {
         hackSheet.addRow({
           student: s.username || s.email,
-          event: r.hackathon?.title || r.eventId,
+          event: eventMap.get(r.eventId) || r.eventId,
           date: r.registeredAt ? new Date(r.registeredAt).toLocaleString() : "",
         });
       });
@@ -102,7 +127,7 @@ const generateStudentsExcel = async () => {
       .forEach((r) => {
         internSheet.addRow({
           student: s.username || s.email,
-          event: r.internship?.title || r.eventId,
+          event: eventMap.get(r.eventId) || r.eventId,
           date: r.registeredAt ? new Date(r.registeredAt).toLocaleString() : "",
         });
       });
@@ -121,7 +146,7 @@ const generateStudentsExcel = async () => {
       .forEach((r) => {
         courseSheet.addRow({
           student: s.username || s.email,
-          event: r.course?.title || r.eventId,
+          event: eventMap.get(r.eventId) || r.eventId,
           date: r.registeredAt ? new Date(r.registeredAt).toLocaleString() : "",
         });
       });
