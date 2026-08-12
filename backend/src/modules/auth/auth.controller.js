@@ -71,7 +71,19 @@ const getMe = asyncHandler(async (req, res) => {
 });
 
 const generateGithubUrl = asyncHandler(async (req, res) => {
-  const url = await authService.getGithubOAuthUrl(req.user.id);
+  const studentId = req.query.studentId;
+  let targetUserId = req.user.id;
+  let redirectPath = "/student";
+
+  if (studentId) {
+    if (req.user.role !== "ADMIN") {
+      throw new ApiError(403, "Only admins can authorize a student on their behalf.");
+    }
+    targetUserId = studentId;
+    redirectPath = "/admin";
+  }
+
+  const url = await authService.getGithubOAuthUrl(targetUserId, redirectPath);
   return ApiResponse.success(res, { url }, "GitHub OAuth URL generated");
 });
 
@@ -89,12 +101,16 @@ const githubOAuthCallback = asyncHandler(async (req, res) => {
     return res.redirect(`${process.env.FRONTEND_URL}/student?error=github_failed`);
   }
 
-  const result = await authService.linkGithubViaOAuth(code, state);
+  const parsedState = JSON.parse(Buffer.from(state, "base64").toString());
+  const result = await authService.linkGithubViaOAuth(code, parsedState.targetUserId);
+  const redirectPath = parsedState.redirectPath || "/student";
+  const targetStudentId = parsedState.targetUserId;
+
   if (!result.success) {
-    return res.redirect(`${process.env.FRONTEND_URL}/student?error=github_failed`);
+    return res.redirect(`${process.env.FRONTEND_URL}${redirectPath}?error=github_failed&studentId=${targetStudentId}`);
   }
 
-  return res.redirect(`${process.env.FRONTEND_URL}/student?github=linked`);
+  return res.redirect(`${process.env.FRONTEND_URL}${redirectPath}?github=linked&studentId=${targetStudentId}`);
 });
 
 const logout = asyncHandler(async (req, res) => {

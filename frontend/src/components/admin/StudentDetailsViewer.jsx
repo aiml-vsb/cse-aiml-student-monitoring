@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import { useLocation } from "react-router-dom";
 import { Users, Trash2, Loader, Edit2, Check, X, Download } from "lucide-react";
 import api from "../../api/client";
 import endpoints from "../../api/endpoints";
@@ -16,7 +16,15 @@ export default function StudentDetailsViewer() {
     githubUsername: "",
     profileComplete: false,
   });
+  const [repoStudent, setRepoStudent] = useState(null);
+  const [repos, setRepos] = useState([]);
+  const [repoLoading, setRepoLoading] = useState(false);
+  const [repoError, setRepoError] = useState("");
+  const [repoModalOpen, setRepoModalOpen] = useState(false);
+  const [authErrorByStudent, setAuthErrorByStudent] = useState({});
+  const [authLoadingByStudent, setAuthLoadingByStudent] = useState({});
   const toast = useToast();
+  const location = useLocation();
 
   const fetchStudents = async () => {
     try {
@@ -33,6 +41,34 @@ export default function StudentDetailsViewer() {
   useEffect(() => {
     fetchStudents();
   }, []);
+
+  useEffect(() => {
+    const query = new URLSearchParams(location.search);
+    const githubLinked = query.get("github");
+    const githubError = query.get("error");
+    const studentId = query.get("studentId");
+
+    if (studentId && githubLinked === "linked") {
+      toast.success("GitHub authorized successfully for student.");
+      setAuthErrorByStudent((prev) => {
+        const next = { ...prev };
+        delete next[studentId];
+        return next;
+      });
+      fetchStudents();
+      window.history.replaceState({}, "", location.pathname);
+      return;
+    }
+
+    if (studentId && githubError === "github_failed") {
+      setAuthErrorByStudent((prev) => ({
+        ...prev,
+        [studentId]: "GitHub authorization failed. Retry.",
+      }));
+      toast.error("GitHub authorization failed for student.");
+      window.history.replaceState({}, "", location.pathname);
+    }
+  }, [location, toast]);
 
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this student and all their data?")) return;
@@ -105,6 +141,60 @@ export default function StudentDetailsViewer() {
     } catch (err) {
       toast.error(err.response?.data?.message || "Export failed");
     }
+  };
+
+  const handleAuthorizeStudent = async (studentId) => {
+    setAuthLoadingByStudent((prev) => ({ ...prev, [studentId]: true }));
+    setAuthErrorByStudent((prev) => {
+      const next = { ...prev };
+      delete next[studentId];
+      return next;
+    });
+
+    try {
+      const { data } = await api.get(`${endpoints.githubUrl}?studentId=${studentId}`);
+      window.location.href = data.data.url;
+    } catch (err) {
+      const message = err.response?.data?.message || "Failed to initiate GitHub authorization.";
+      setAuthErrorByStudent((prev) => ({ ...prev, [studentId]: message }));
+      setAuthLoadingByStudent((prev) => ({ ...prev, [studentId]: false }));
+      toast.error(message);
+    }
+  };
+
+  const handleShowRepos = async (student) => {
+    if (!student.githubUsername) {
+      toast.error("This student does not have a linked GitHub username.");
+      return;
+    }
+
+    setRepoStudent(student);
+    setRepoLoading(true);
+    setRepoError("");
+    setRepoModalOpen(true);
+
+    try {
+      const response = await fetch(
+        `https://api.github.com/users/${encodeURIComponent(student.githubUsername)}/repos?per_page=100&sort=updated`
+      );
+      if (!response.ok) {
+        const message = response.status === 404 ? "GitHub user not found." : "Failed to fetch repos.";
+        throw new Error(message);
+      }
+      const data = await response.json();
+      setRepos(data || []);
+    } catch (err) {
+      setRepoError(err.message || "Failed to fetch repos.");
+    } finally {
+      setRepoLoading(false);
+    }
+  };
+
+  const handleCloseRepoModal = () => {
+    setRepoModalOpen(false);
+    setRepos([]);
+    setRepoStudent(null);
+    setRepoError("");
   };
 
   return (
@@ -213,13 +303,41 @@ export default function StudentDetailsViewer() {
                         </td>
                         <td className="py-2 px-3 text-red-400">{student.impositionCount || 0}</td>
                         <td className="py-2 px-3">
-                          <div className="flex gap-2 items-center">
-                            <button onClick={() => handleEdit(student)} className="p-1 rounded hover:bg-white/10 text-primary-400">
-                              <Edit2 className="w-4 h-4" />
-                            </button>
-                            <button onClick={() => handleDelete(student.id)} className="p-1 rounded hover:bg-red-500/10 text-red-400">
-                              <Trash2 className="w-4 h-4" />
-                            </button>
+                          <div className="flex flex-col gap-1">
+                            <div className="flex gap-2 items-center">
+                              <button
+                                onClick={() =>
+                                  student.githubUsername
+                                    ? handleShowRepos(student)
+                                    : handleAuthorizeStudent(student.id)
+                                }
+                                disabled={!!authLoadingByStudent[student.id]}
+                                className={`rounded px-3 py-1 text-sm font-semibold transition ${
+                                  student.githubUsername
+                                    ? "bg-emerald-500 text-white"
+                                    : authErrorByStudent[student.id]
+                                    ? "bg-red-500 text-white"
+                                    : "bg-blue-500 text-white hover:bg-blue-400"
+                                } ${authLoadingByStudent[student.id] ? "opacity-70 cursor-not-allowed" : ""}`}
+                              >
+                                {authLoadingByStudent[student.id]
+                                  ? "Processing..."
+                                  : student.githubUsername
+                                  ? "Authorized"
+                                  : authErrorByStudent[student.id]
+                                  ? "Retry"
+                                  : "Authorize"}
+                              </button>
+                              <button onClick={() => handleEdit(student)} className="p-1 rounded hover:bg-white/10 text-primary-400">
+                                <Edit2 className="w-4 h-4" />
+                              </button>
+                              <button onClick={() => handleDelete(student.id)} className="p-1 rounded hover:bg-red-500/10 text-red-400">
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </div>
+                            {authErrorByStudent[student.id] && (
+                              <div className="text-xs text-red-400">{authErrorByStudent[student.id]}</div>
+                            )}
                           </div>
                         </td>
                       </>
@@ -228,6 +346,55 @@ export default function StudentDetailsViewer() {
                 ))}
               </tbody>
             </table>
+          </div>
+        </div>
+      )}
+
+      {repoModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+          <div className="w-full max-w-2xl rounded-2xl bg-slate-950 p-6 shadow-2xl">
+            <div className="flex items-center justify-between gap-4 pb-4 border-b border-white/10">
+              <div>
+                <h3 className="text-xl font-semibold text-white">{repoStudent?.githubUsername}'s GitHub repos</h3>
+                <p className="text-sm text-dark-300">Showing public repos from GitHub.</p>
+              </div>
+              <button
+                onClick={handleCloseRepoModal}
+                className="rounded-lg bg-white/10 px-3 py-2 text-sm text-white hover:bg-white/20"
+              >
+                Close
+              </button>
+            </div>
+
+            <div className="mt-4 space-y-4">
+              {repoLoading ? (
+                <div className="flex justify-center py-10">
+                  <Loader className="w-8 h-8 animate-spin text-primary-400" />
+                </div>
+              ) : repoError ? (
+                <div className="rounded-xl bg-red-500/10 p-4 text-red-200">{repoError}</div>
+              ) : repos.length === 0 ? (
+                <div className="rounded-xl bg-white/5 p-4 text-dark-300">No repositories found.</div>
+              ) : (
+                <div className="grid gap-3">
+                  {repos.map((repo) => (
+                    <a
+                      key={repo.id}
+                      href={repo.html_url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="rounded-2xl border border-white/10 bg-slate-900 p-4 transition hover:border-primary-400"
+                    >
+                      <div className="flex items-center justify-between gap-4">
+                        <h4 className="text-base font-semibold text-white">{repo.name}</h4>
+                        <span className="text-sm text-dark-300">{repo.language || "—"}</span>
+                      </div>
+                      <p className="mt-2 text-sm text-dark-300">{repo.description || "No description provided."}</p>
+                    </a>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </div>
       )}

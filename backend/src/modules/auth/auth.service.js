@@ -144,11 +144,11 @@ const getCurrentUser = async (userId) => {
 /**
  * Generate GitHub OAuth URL for linking.
  */
-const getGithubOAuthUrl = async (userId) => {
-  const user = await prisma.user.findUnique({ where: { id: userId } });
+const getGithubOAuthUrl = async (targetUserId, redirectPath = "/student") => {
+  const user = await prisma.user.findUnique({ where: { id: targetUserId } });
   if (!user) throw new ApiError(404, "User not found");
 
-  const state = Buffer.from(JSON.stringify({ userId })).toString("base64");
+  const state = Buffer.from(JSON.stringify({ targetUserId, redirectPath })).toString("base64");
   return githubService.getOAuthURL(state);
 };
 
@@ -181,10 +181,8 @@ const linkGithubAccount = async (userId, code) => {
 /**
  * GitHub OAuth redirect callback – links GitHub using state.
  */
-const linkGithubViaOAuth = async (code, state) => {
+const linkGithubViaOAuth = async (code, targetUserId) => {
   try {
-    const { userId } = JSON.parse(Buffer.from(state, "base64").toString());
-
     const accessToken = await githubService.exchangeCodeForToken(code);
     const githubUser = await githubService.getGitHubUser(accessToken);
 
@@ -192,12 +190,12 @@ const linkGithubViaOAuth = async (code, state) => {
       where: { githubUsername: githubUser.username },
     });
 
-    if (existingUser && existingUser.id !== userId) {
+    if (existingUser && existingUser.id !== targetUserId) {
       return { success: false, error: "GitHub account already linked to another user" };
     }
 
     await prisma.user.update({
-      where: { id: userId },
+      where: { id: targetUserId },
       data: {
         githubUsername: githubUser.username,
         githubAccessToken: accessToken,
