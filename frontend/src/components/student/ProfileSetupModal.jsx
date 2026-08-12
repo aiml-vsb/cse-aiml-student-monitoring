@@ -25,6 +25,24 @@ const extractLeetCodeUsername = (input) => {
   return str.replace(/^@/, "");
 };
 
+// Extract GitHub username from either plain username or full profile URL
+const extractGithubUsername = (input) => {
+  const str = (input || "").trim();
+  if (!str) return "";
+
+  if (str.includes("github.com")) {
+    try {
+      const url = new URL(str.startsWith("http") ? str : `https://${str}`);
+      const parts = url.pathname.split("/").filter(Boolean);
+      return parts.length > 0 ? parts[0] : str;
+    } catch {
+      return str;
+    }
+  }
+
+  return str.replace(/^@/, "");
+};
+
 export default function ProfileSetupModal({ onClose }) {
   const [formData, setFormData] = useState({
     username: "",
@@ -43,6 +61,11 @@ export default function ProfileSetupModal({ onClose }) {
       setFormData((prev) => ({
         ...prev,
         leetcodeUsername: extractLeetCodeUsername(value),
+      }));
+    } else if (name === "githubUsername") {
+      setFormData((prev) => ({
+        ...prev,
+        githubUsername: extractGithubUsername(value),
       }));
     } else {
       setFormData({ ...formData, [name]: value });
@@ -65,6 +88,17 @@ export default function ProfileSetupModal({ onClose }) {
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to save profile");
     } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleGithubLink = async () => {
+    setSaving(true);
+    try {
+      const { data } = await api.get(endpoints.githubUrl);
+      window.location.href = data.data.url;
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to initiate GitHub linking");
       setSaving(false);
     }
   };
@@ -137,7 +171,7 @@ export default function ProfileSetupModal({ onClose }) {
           </div>
 
           <div>
-            <label className="label-dark">GitHub Username</label>
+            <label className="label-dark">GitHub Username or URL</label>
             <input
               type="text"
               name="githubUsername"
@@ -145,9 +179,22 @@ export default function ProfileSetupModal({ onClose }) {
               value={formData.githubUsername}
               onChange={handleChange}
               className="input-dark"
-              placeholder="e.g., johndoe"
+              placeholder="e.g., johndoe or https://github.com/johndoe"
             />
+            <p className="text-xs text-dark-400 mt-1">
+              We'll extract your GitHub username automatically if you paste a profile link.
+            </p>
           </div>
+
+          <button
+            type="button"
+            onClick={handleGithubLink}
+            disabled={saving}
+            className="btn-secondary w-full py-3"
+          >
+            <Github className="w-4 h-4 mr-2" />
+            Link GitHub via OAuth
+          </button>
 
           <button
             type="submit"

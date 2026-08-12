@@ -23,6 +23,23 @@ const extractLeetCodeUsername = (input) => {
   return str.replace(/^@/, "");
 };
 
+const extractGithubUsername = (input) => {
+  const str = (input || "").trim();
+  if (!str) return "";
+
+  if (str.includes("github.com")) {
+    try {
+      const url = new URL(str.startsWith("http") ? str : `https://${str}`);
+      const parts = url.pathname.split("/").filter(Boolean);
+      return parts.length > 0 ? parts[0] : str;
+    } catch {
+      return str;
+    }
+  }
+
+  return str.replace(/^@/, "");
+};
+
 const getMyProfile = async (studentId) => {
   const student = await prisma.user.findUnique({
     where: { id: studentId },
@@ -68,6 +85,10 @@ const updateMyProfile = async (studentId, payload) => {
   // Clean LeetCode username (support both username and full URL)
   if (payload.leetcodeUsername) {
     payload.leetcodeUsername = extractLeetCodeUsername(payload.leetcodeUsername);
+  }
+
+  if (payload.githubUsername) {
+    payload.githubUsername = extractGithubUsername(payload.githubUsername);
   }
 
   // Check LeetCode username uniqueness
@@ -170,6 +191,10 @@ const updateStudentByAdmin = async (id, payload) => {
 
   if (payload.leetcodeUsername) {
     payload.leetcodeUsername = extractLeetCodeUsername(payload.leetcodeUsername);
+  }
+
+  if (payload.githubUsername) {
+    payload.githubUsername = extractGithubUsername(payload.githubUsername);
   }
 
   const updated = await prisma.user.update({

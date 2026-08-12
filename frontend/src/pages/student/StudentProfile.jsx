@@ -18,6 +18,7 @@ export default function StudentProfile() {
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [linking, setLinking] = useState(false);
   const { user, updateUser } = useAuth();
   const toast = useToast();
   const navigate = useNavigate();
@@ -34,8 +35,57 @@ export default function StudentProfile() {
     setLoading(false);
   }, [user]);
 
+  const extractLeetCodeUsername = (input) => {
+    const str = (input || "").trim();
+    if (!str) return "";
+
+    if (str.includes("leetcode.com")) {
+      try {
+        const url = new URL(str.startsWith("http") ? str : `https://${str}`);
+        const parts = url.pathname.split("/").filter(Boolean);
+        if (parts[0] === "u" && parts[1]) return parts[1];
+        if (parts.length >= 1) return parts[parts.length - 1];
+      } catch {
+        return str;
+      }
+    }
+
+    return str.replace(/^@/, "");
+  };
+
+  const extractGithubUsername = (input) => {
+    const str = (input || "").trim();
+    if (!str) return "";
+
+    if (str.includes("github.com")) {
+      try {
+        const url = new URL(str.startsWith("http") ? str : `https://${str}`);
+        const parts = url.pathname.split("/").filter(Boolean);
+        return parts.length > 0 ? parts[0] : str;
+      } catch {
+        return str;
+      }
+    }
+
+    return str.replace(/^@/, "");
+  };
+
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+
+    if (name === "leetcodeUsername") {
+      setFormData((prev) => ({
+        ...prev,
+        leetcodeUsername: extractLeetCodeUsername(value),
+      }));
+    } else if (name === "githubUsername") {
+      setFormData((prev) => ({
+        ...prev,
+        githubUsername: extractGithubUsername(value),
+      }));
+    } else {
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -49,6 +99,17 @@ export default function StudentProfile() {
       toast.error(err.response?.data?.message || "Failed to update profile");
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleGithubLink = async () => {
+    setLinking(true);
+    try {
+      const { data } = await api.get(endpoints.githubUrl);
+      window.location.href = data.data.url;
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to start GitHub linking");
+      setLinking(false);
     }
   };
 
@@ -122,7 +183,7 @@ export default function StudentProfile() {
             </div>
 
             <div>
-              <label className="label-dark">LeetCode Username</label>
+              <label className="label-dark">LeetCode Username or URL</label>
               <div className="relative">
                 <Code2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-dark-500" />
                 <input
@@ -132,15 +193,16 @@ export default function StudentProfile() {
                   value={formData.leetcodeUsername}
                   onChange={handleChange}
                   className="input-dark pl-9"
+                  placeholder="e.g., johndoe or https://leetcode.com/u/johndoe/"
                 />
               </div>
               <p className="text-xs text-dark-400 mt-1">
-                Your LeetCode profile must be public for verification.
+                Your LeetCode profile must be public for verification; you can paste the profile URL.
               </p>
             </div>
 
             <div>
-              <label className="label-dark">GitHub Username</label>
+              <label className="label-dark">GitHub Username or URL</label>
               <div className="relative">
                 <Github className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-dark-500" />
                 <input
@@ -150,8 +212,28 @@ export default function StudentProfile() {
                   value={formData.githubUsername}
                   onChange={handleChange}
                   className="input-dark pl-9"
+                  placeholder="e.g., johndoe or https://github.com/johndoe"
                 />
               </div>
+              <p className="text-xs text-dark-400 mt-1">
+                You can paste your GitHub profile URL and we will extract the username.
+              </p>
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <button
+                type="button"
+                onClick={handleGithubLink}
+                disabled={saving || linking}
+                className="btn-secondary w-full py-3"
+              >
+                {linking ? (
+                  <Loader className="w-4 h-4 animate-spin mr-2" />
+                ) : (
+                  <Github className="w-4 h-4 mr-2" />
+                )}
+                {linking ? "Connecting..." : "Link GitHub via OAuth"}
+              </button>
             </div>
 
             <button type="submit" disabled={saving} className="btn-primary w-full py-3">

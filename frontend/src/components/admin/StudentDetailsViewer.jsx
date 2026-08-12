@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Users, Trash2, Loader, Edit2, Check, X, Download } from "lucide-react";
+import { Users, Trash2, Loader, Edit2, Check, X, Download, Github, ExternalLink } from "lucide-react";
 import api from "../../api/client";
 import endpoints from "../../api/endpoints";
 import { useToast } from "../../context/ToastContext";
@@ -16,6 +16,11 @@ export default function StudentDetailsViewer() {
     githubUsername: "",
     profileComplete: false,
   });
+  const [repoStudent, setRepoStudent] = useState(null);
+  const [repos, setRepos] = useState([]);
+  const [repoLoading, setRepoLoading] = useState(false);
+  const [repoError, setRepoError] = useState("");
+  const [repoModalOpen, setRepoModalOpen] = useState(false);
   const toast = useToast();
 
   const fetchStudents = async () => {
@@ -105,6 +110,41 @@ export default function StudentDetailsViewer() {
     } catch (err) {
       toast.error(err.response?.data?.message || "Export failed");
     }
+  };
+
+  const handleShowRepos = async (student) => {
+    if (!student.githubUsername) {
+      toast.error("This student does not have a linked GitHub username.");
+      return;
+    }
+
+    setRepoStudent(student);
+    setRepoLoading(true);
+    setRepoError("");
+    setRepoModalOpen(true);
+
+    try {
+      const response = await fetch(
+        `https://api.github.com/users/${encodeURIComponent(student.githubUsername)}/repos?per_page=100&sort=updated`
+      );
+      if (!response.ok) {
+        const message = response.status === 404 ? "GitHub user not found." : "Failed to fetch repos.";
+        throw new Error(message);
+      }
+      const data = await response.json();
+      setRepos(data || []);
+    } catch (err) {
+      setRepoError(err.message || "Failed to fetch repos.");
+    } finally {
+      setRepoLoading(false);
+    }
+  };
+
+  const handleCloseRepoModal = () => {
+    setRepoModalOpen(false);
+    setRepos([]);
+    setRepoStudent(null);
+    setRepoError("");
   };
 
   return (
@@ -213,7 +253,10 @@ export default function StudentDetailsViewer() {
                         </td>
                         <td className="py-2 px-3 text-red-400">{student.impositionCount || 0}</td>
                         <td className="py-2 px-3">
-                          <div className="flex gap-2">
+                          <div className="flex gap-2 items-center">
+                            <button onClick={() => handleShowRepos(student)} className="p-1 rounded hover:bg-white/10 text-cyan-300" title="View GitHub repos">
+                              <Github className="w-4 h-4" />
+                            </button>
                             <button onClick={() => handleEdit(student)} className="p-1 rounded hover:bg-white/10 text-primary-400">
                               <Edit2 className="w-4 h-4" />
                             </button>
@@ -228,6 +271,70 @@ export default function StudentDetailsViewer() {
                 ))}
               </tbody>
             </table>
+          </div>
+        </div>
+      )}
+
+      {repoModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70">
+          <div className="relative w-full max-w-3xl bg-dark-950 border border-white/10 rounded-2xl shadow-2xl overflow-hidden">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-white/10">
+              <div>
+                <h3 className="text-xl font-semibold text-white">
+                  {repoStudent?.username || repoStudent?.githubUsername}'s GitHub Repos
+                </h3>
+                <p className="text-sm text-dark-400">Showing public repositories for {repoStudent?.githubUsername}</p>
+              </div>
+              <button onClick={handleCloseRepoModal} className="p-2 rounded hover:bg-white/10 text-dark-100">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="p-6 max-h-[70vh] overflow-y-auto space-y-4">
+              {repoLoading ? (
+                <div className="flex items-center justify-center py-12">
+                  <Loader className="w-8 h-8 animate-spin text-primary-400" />
+                </div>
+              ) : repoError ? (
+                <div className="text-center text-red-400">{repoError}</div>
+              ) : repos.length === 0 ? (
+                <div className="text-center text-dark-300">No public repositories found.</div>
+              ) : (
+                <div className="space-y-3">
+                  {repos.map((repo) => (
+                    <div key={repo.id} className="p-4 bg-white/5 rounded-xl border border-white/10">
+                      <div className="flex items-start justify-between gap-3">
+                        <div>
+                          <a
+                            href={repo.html_url}
+                            target="_blank"
+                            rel="noreferrer noopener"
+                            className="text-white font-semibold hover:text-primary-300"
+                          >
+                            {repo.name}
+                          </a>
+                          <p className="text-dark-400 text-sm mt-1">{repo.description || "No description"}</p>
+                        </div>
+                        <a
+                          href={repo.html_url}
+                          target="_blank"
+                          rel="noreferrer noopener"
+                          className="text-dark-300 hover:text-white"
+                          title="Open repository"
+                        >
+                          <ExternalLink className="w-5 h-5" />
+                        </a>
+                      </div>
+                      <div className="mt-3 flex flex-wrap gap-2 text-xs text-dark-400">
+                        <span>★ {repo.stargazers_count}</span>
+                        <span>Forks: {repo.forks_count}</span>
+                        <span>{repo.language || "Unknown"}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </div>
       )}

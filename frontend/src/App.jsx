@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "./context/AuthContext";
+import { useToast } from "./context/ToastContext";
 import Landing from "./pages/Landing";
 import Login from "./pages/Login";
 import VerifyOTP from "./pages/VerifyOTP";
@@ -36,23 +37,34 @@ function ProtectedRoute({ children, allowedRoles }) {
 
 export default function App() {
   const location = useLocation();
+  const toast = useToast();
 
-  // Handle Google OAuth callback – token passed via URL in /student?token=...
+  // Handle OAuth callback query params
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const token = params.get("token");
+    const githubLinked = params.get("github");
+    const githubError = params.get("error");
 
     if (token) {
-      // Store JWT token
       localStorage.setItem("token", token);
-
-      // Clean the URL (remove ?token=) to avoid exposing token
       window.history.replaceState({}, "", "/student");
-
-      // Reload to let AuthProvider pick up the token (or use state directly)
       window.location.reload();
+      return;
     }
-  }, [location]);
+
+    if (githubLinked === "linked") {
+      toast.success("GitHub linked successfully!");
+      window.history.replaceState({}, "", "/student");
+      window.location.reload();
+      return;
+    }
+
+    if (githubError === "github_failed") {
+      toast.error("GitHub linking failed. Please try again.");
+      window.history.replaceState({}, "", "/student");
+    }
+  }, [location, toast]);
 
   return (
     <Routes>
