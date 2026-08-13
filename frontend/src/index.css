@@ -26,7 +26,7 @@
 
 @layer components {
   .glass-card {
-    @apply bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl;
+    @apply bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl;
   }
   .event-card {
     @apply glass-card p-6 flex flex-col;
@@ -35,13 +35,13 @@
     @apply inline-flex items-center justify-center px-5 py-2.5 text-sm font-semibold text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-all duration-200 shadow-glow hover:shadow-glow-sm focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-2 focus:ring-offset-dark-900;
   }
   .btn-secondary {
-    @apply inline-flex items-center justify-center px-5 py-2.5 text-sm font-semibold text-white bg-secondary-600 hover:bg-secondary-700 rounded-lg transition-all duration-200 shadow-glow-blue hover:shadow-glow-sm focus:outline-none focus:ring-2 focus:ring-secondary-400 focus:ring-offset-2 focus:ring-offset-dark-900;
+    @apply inline-flex items-center justify-center px-5 py-2.5 text-sm font-semibold text-white bg-secondary-600 hover:bg-secondary-700 rounded-lg transition-all duration-200 shadow-glow-green hover:shadow-glow-sm focus:outline-none focus:ring-2 focus:ring-secondary-400 focus:ring-offset-2 focus:ring-offset-dark-900;
   }
   .btn-danger {
-    @apply inline-flex items-center justify-center px-5 py-2.5 text-sm font-semibold text-white bg-red-500 hover:bg-red-600 rounded-lg transition-all duration-200 shadow-glow-red hover:shadow-glow-sm focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-2 focus:ring-offset-dark-900;
+    @apply inline-flex items-center justify-center px-5 py-2.5 text-sm font-semibold text-white bg-red-600 hover:bg-red-700 rounded-lg transition-all duration-200 shadow-glow-red hover:shadow-glow-sm focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-2 focus:ring-offset-dark-900;
   }
   .input-dark {
-    @apply w-full px-4 py-2.5 text-white bg-dark-800 border border-dark-600 rounded-lg focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 transition-colors;
+    @apply w-full px-4 py-2.5 text-white bg-dark-800/50 border border-dark-600 rounded-lg focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 transition-colors;
   }
   .label-dark {
     @apply block text-sm font-medium text-dark-300 mb-1.5;
@@ -71,8 +71,8 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(79, 70, 229, 0.05);
+  border: 1px solid rgba(79, 70, 229, 0.2);
   border-radius: 1rem;
   padding: 1.5rem 2.5rem;
 }
@@ -81,8 +81,9 @@
   font-size: 0.8rem;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: #a1a1aa;
+  color: #cbd5e1;
   margin-bottom: 0.5rem;
+  font-weight: 600;
 }
 
 .countdown-box .time-value {
@@ -90,8 +91,8 @@
   line-height: 1;
   font-weight: 800;
   font-family: "JetBrains Mono", monospace;
-  color: #4ade80; /* green */
-  text-shadow: 0 0 20px rgba(74, 222, 128, 0.3);
+  color: #6366f1;
+  text-shadow: 0 0 20px rgba(99, 102, 241, 0.2);
 }
 
 /* Challenge card – full width, comfortable padding */

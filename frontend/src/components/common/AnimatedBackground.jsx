@@ -15,7 +15,7 @@ export default function AnimatedBackground() {
         transition={{ duration: 10, repeat: Infinity }}
       />
       <motion.div
-        className="absolute bottom-0 left-1/4 w-80 h-80 rounded-full bg-purple-600/15 blur-3xl"
+        className="absolute bottom-0 left-1/4 w-80 h-80 rounded-full bg-primary-600/10 blur-3xl"
         animate={{ y: [0, 15, 0], x: [0, -15, 0] }}
         transition={{ duration: 12, repeat: Infinity }}
       />
