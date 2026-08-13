@@ -8,7 +8,8 @@ export default function ChallengeHistory({ challenges }) {
   }
 
   return (
-    <div className="space-y-2 max-h-96 overflow-y-auto pr-1">
+    <div className="h-full overflow-y-auto">
+      <div className="space-y-2">
       {challenges.map((challenge) => {
         const isExpired = isDeadlineExpired(challenge.endTime);
         const displayStatus =
@@ -54,6 +55,7 @@ export default function ChallengeHistory({ challenges }) {
         </div>
         );
       })}
+      </div>
     </div>
   );
 }

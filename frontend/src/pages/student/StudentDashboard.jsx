@@ -189,15 +189,17 @@ export default function StudentDashboard() {
 
         <div className="grid lg:grid-cols-4 gap-6">
           <aside className="lg:col-span-1 space-y-6">
-            <div className="glass-card p-4 sticky top-20">
-              <h2 className="text-lg font-bold text-white mb-3 flex items-center gap-2">
+            <div className="glass-card p-4 sticky top-20 max-h-80 flex flex-col">
+              <h2 className="text-lg font-bold text-white mb-3 flex items-center gap-2 flex-shrink-0">
                 <History className="w-4 h-4 text-secondary-400" />
                 Challenge History
               </h2>
-              <ChallengeHistory challenges={challenges} />
+              <div className="flex-1 overflow-hidden">
+                <ChallengeHistory challenges={challenges} />
+              </div>
             </div>
 
-            <div className="glass-card p-4 sticky top-72">
+            <div className="glass-card p-4 sticky top-96">
               <h2 className="text-lg font-bold text-white mb-3">Registrations</h2>
               <div className="space-y-2">
                 {categoryMeta.map(({ id, label, count, icon: Icon, iconClass }) => (
