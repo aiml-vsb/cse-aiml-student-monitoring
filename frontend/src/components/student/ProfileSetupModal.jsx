@@ -230,15 +230,25 @@ export default function ProfileSetupModal({ onClose }) {
             </p>
           </div>
 
-          <button
-            type="button"
-            onClick={handleGithubLink}
-            disabled={saving}
-            className="btn-secondary w-full py-3"
-          >
-            <Github className="w-4 h-4 mr-2" />
-            Link GitHub via OAuth
-          </button>
+          {formData.githubUsername || user?.githubUsername ? (
+            <div className="flex items-center justify-between rounded-lg border border-emerald-500/50 bg-emerald-500/10 px-3 py-2 text-sm text-emerald-300">
+              <span className="flex items-center gap-2 font-medium">
+                <Github className="w-4 h-4" />
+                GitHub Authorized
+              </span>
+              <span className="text-xs text-emerald-200">{formData.githubUsername || user?.githubUsername}</span>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={handleGithubLink}
+              disabled={saving}
+              className="inline-flex items-center justify-center rounded-lg border border-white/10 bg-black px-3 py-2 text-sm font-medium text-white transition hover:bg-neutral-800 disabled:opacity-50"
+            >
+              <Github className="w-4 h-4 mr-2" />
+              GitHub
+            </button>
+          )}
 
           <button
             type="submit"

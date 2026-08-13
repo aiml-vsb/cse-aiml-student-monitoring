@@ -312,21 +312,21 @@ export default function StudentDetailsViewer() {
                                     : handleAuthorizeStudent(student.id)
                                 }
                                 disabled={!!authLoadingByStudent[student.id]}
-                                className={`rounded px-3 py-1 text-sm font-semibold transition ${
+                                className={`rounded-md border px-2.5 py-1.5 text-xs font-medium transition ${
                                   student.githubUsername
-                                    ? "bg-emerald-500 text-white"
+                                    ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20"
                                     : authErrorByStudent[student.id]
-                                    ? "bg-red-500 text-white"
-                                    : "bg-blue-500 text-white hover:bg-blue-400"
+                                    ? "border-red-500/40 bg-red-500/10 text-red-300 hover:bg-red-500/20"
+                                    : "border-white/10 bg-black text-white hover:bg-neutral-800"
                                 } ${authLoadingByStudent[student.id] ? "opacity-70 cursor-not-allowed" : ""}`}
                               >
                                 {authLoadingByStudent[student.id]
                                   ? "Processing..."
                                   : student.githubUsername
-                                  ? "Authorized"
+                                  ? "Show Repos"
                                   : authErrorByStudent[student.id]
                                   ? "Retry"
-                                  : "Authorize"}
+                                  : "GitHub"}
                               </button>
                               <button onClick={() => handleEdit(student)} className="p-1 rounded hover:bg-white/10 text-primary-400">
                                 <Edit2 className="w-4 h-4" />
@@ -360,7 +360,7 @@ export default function StudentDetailsViewer() {
               </div>
               <button
                 onClick={handleCloseRepoModal}
-                className="rounded-lg bg-white/10 px-3 py-2 text-sm text-white hover:bg-white/20"
+                className="rounded-lg bg-white/10 px-2.5 py-1.5 text-xs font-medium text-white hover:bg-white/20"
               >
                 Close
               </button>
