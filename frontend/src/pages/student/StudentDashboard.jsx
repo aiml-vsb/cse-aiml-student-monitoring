@@ -21,6 +21,7 @@ export default function StudentDashboard() {
   const [courses, setCourses] = useState([]);
   const [registrations, setRegistrations] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedCategory, setSelectedCategory] = useState("hackathons");
   const [showProfileSetup, setShowProfileSetup] = useState(false);
   const { user } = useAuth();
   const toast = useToast();
@@ -63,6 +64,108 @@ export default function StudentDashboard() {
   const isRegistered = (eventType, eventId) =>
     registrations.some((r) => r.eventType === eventType && r.eventId === eventId);
 
+  const categoryMeta = [
+    {
+      id: "hackathons",
+      label: "Hackathons",
+      count: hackathons.length,
+      icon: Trophy,
+      iconClass: "text-secondary-400",
+    },
+    {
+      id: "internships",
+      label: "Internships",
+      count: internships.length,
+      icon: Briefcase,
+      iconClass: "text-green-400",
+    },
+    {
+      id: "courses",
+      label: "Courses",
+      count: courses.length,
+      icon: GraduationCap,
+      iconClass: "text-primary-400",
+    },
+  ];
+
+  const renderSelectedCategory = () => {
+    if (selectedCategory === "hackathons") {
+      return (
+        <section>
+          <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+            <Trophy className="w-5 h-5 text-secondary-400" />
+            Hackathons
+          </h2>
+          {hackathons.length === 0 ? (
+            <p className="text-dark-400">No hackathons available.</p>
+          ) : (
+            <div className="grid md:grid-cols-2 gap-8 max-w-4xl">
+              {hackathons.map((hackathon) => (
+                <HackathonCard
+                  key={hackathon.id}
+                  hackathon={hackathon}
+                  registered={isRegistered("HACKATHON", hackathon.id)}
+                  onRegister={fetchData}
+                  onUnregister={fetchData}
+                />
+              ))}
+            </div>
+          )}
+        </section>
+      );
+    }
+
+    if (selectedCategory === "internships") {
+      return (
+        <section>
+          <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+            <Briefcase className="w-5 h-5 text-green-400" />
+            Internships
+          </h2>
+          {internships.length === 0 ? (
+            <p className="text-dark-400">No internships available.</p>
+          ) : (
+            <div className="grid md:grid-cols-2 gap-8 max-w-4xl">
+              {internships.map((internship) => (
+                <InternshipCard
+                  key={internship.id}
+                  internship={internship}
+                  registered={isRegistered("INTERNSHIP", internship.id)}
+                  onRegister={fetchData}
+                  onUnregister={fetchData}
+                />
+              ))}
+            </div>
+          )}
+        </section>
+      );
+    }
+
+    return (
+      <section>
+        <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+          <GraduationCap className="w-5 h-5 text-primary-400" />
+          Courses
+        </h2>
+        {courses.length === 0 ? (
+          <p className="text-dark-400">No courses available.</p>
+        ) : (
+          <div className="grid md:grid-cols-2 gap-8 max-w-4xl">
+            {courses.map((course) => (
+              <CourseCard
+                key={course.id}
+                course={course}
+                registered={isRegistered("COURSE", course.id)}
+                onRegister={fetchData}
+                onUnregister={fetchData}
+              />
+            ))}
+          </div>
+        )}
+      </section>
+    );
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -85,8 +188,7 @@ export default function StudentDashboard() {
         </div>
 
         <div className="grid lg:grid-cols-4 gap-6">
-          {/* Sidebar – Challenge History */}
-          <aside className="lg:col-span-1">
+          <aside className="lg:col-span-1 space-y-6">
             <div className="glass-card p-4 sticky top-20">
               <h2 className="text-lg font-bold text-white mb-3 flex items-center gap-2">
                 <History className="w-4 h-4 text-secondary-400" />
@@ -94,11 +196,35 @@ export default function StudentDashboard() {
               </h2>
               <ChallengeHistory challenges={challenges} />
             </div>
+
+            <div className="glass-card p-4 sticky top-72">
+              <h2 className="text-lg font-bold text-white mb-3">Registrations</h2>
+              <div className="space-y-2">
+                {categoryMeta.map(({ id, label, count, icon: Icon, iconClass }) => (
+                  <button
+                    key={id}
+                    type="button"
+                    onClick={() => setSelectedCategory(id)}
+                    className={`w-full flex items-center justify-between rounded-xl border px-3 py-2 text-left transition ${
+                      selectedCategory === id
+                        ? "border-primary-500/60 bg-primary-500/10 text-white"
+                        : "border-white/10 bg-white/5 text-dark-300 hover:bg-white/10"
+                    }`}
+                  >
+                    <span className="flex items-center gap-2">
+                      <Icon className={`w-4 h-4 ${iconClass}`} />
+                      {label}
+                    </span>
+                    <span className="rounded-full bg-black/20 px-2 py-0.5 text-xs font-semibold text-white">
+                      {count}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
           </aside>
 
-          {/* Main Content */}
           <main className="lg:col-span-3 space-y-8">
-            {/* Active Challenge */}
             <section>
               <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
                 <Code2 className="w-5 h-5 text-primary-400" />
@@ -119,74 +245,7 @@ export default function StudentDashboard() {
               )}
             </section>
 
-            {/* Hackathons */}
-            <section>
-              <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-                <Trophy className="w-5 h-5 text-secondary-400" />
-                Hackathons
-              </h2>
-              {hackathons.length === 0 ? (
-                <p className="text-dark-400">No hackathons available.</p>
-              ) : (
-                <div className="grid md:grid-cols-2 gap-8 max-w-4xl">
-                  {hackathons.map((hackathon) => (
-                    <HackathonCard
-                      key={hackathon.id}
-                      hackathon={hackathon}
-                      registered={isRegistered("HACKATHON", hackathon.id)}
-                      onRegister={fetchData}
-                      onUnregister={fetchData}
-                    />
-                  ))}
-                </div>
-              )}
-            </section>
-
-            {/* Internships */}
-            <section>
-              <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-                <Briefcase className="w-5 h-5 text-green-400" />
-                Internships
-              </h2>
-              {internships.length === 0 ? (
-                <p className="text-dark-400">No internships available.</p>
-              ) : (
-                <div className="grid md:grid-cols-2 gap-8 max-w-4xl">
-                  {internships.map((internship) => (
-                    <InternshipCard
-                      key={internship.id}
-                      internship={internship}
-                      registered={isRegistered("INTERNSHIP", internship.id)}
-                      onRegister={fetchData}
-                      onUnregister={fetchData}
-                    />
-                  ))}
-                </div>
-              )}
-            </section>
-
-            {/* Courses */}
-            <section>
-              <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-                <GraduationCap className="w-5 h-5 text-primary-400" />
-                Courses
-              </h2>
-              {courses.length === 0 ? (
-                <p className="text-dark-400">No courses available.</p>
-              ) : (
-                <div className="grid md:grid-cols-2 gap-8 max-w-4xl">
-                  {courses.map((course) => (
-                    <CourseCard
-                      key={course.id}
-                      course={course}
-                      registered={isRegistered("COURSE", course.id)}
-                      onRegister={fetchData}
-                      onUnregister={fetchData}
-                    />
-                  ))}
-                </div>
-              )}
-            </section>
+            {renderSelectedCategory()}
           </main>
         </div>
       </div>

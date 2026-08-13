@@ -18,11 +18,23 @@ const extractLeetCodeUsername = (input) => {
       if (parts[0] === "u" && parts[1]) return parts[1];
       if (parts.length >= 1) return parts[parts.length - 1];
     } catch {
-      return str;
+      return str
+        .replace(/^@/, "")
+        .replace(/^https?:\/\/leetcode\.com\//i, "")
+        .replace(/^u\//i, "")
+        .replace(/\/+$/, "")
+        .split("/")[0]
+        .trim();
     }
   }
 
-  return str.replace(/^@/, "");
+  return str
+    .replace(/^@/, "")
+    .replace(/^https?:\/\/leetcode\.com\//i, "")
+    .replace(/^u\//i, "")
+    .replace(/\/+$/, "")
+    .split("/")[0]
+    .trim();
 };
 
 // Extract GitHub username from either plain username or full profile URL
@@ -36,11 +48,21 @@ const extractGithubUsername = (input) => {
       const parts = url.pathname.split("/").filter(Boolean);
       return parts.length > 0 ? parts[0] : str;
     } catch {
-      return str;
+      return str
+        .replace(/^@/, "")
+        .replace(/^https?:\/\/github\.com\//i, "")
+        .replace(/\/+$/, "")
+        .split("/")[0]
+        .trim();
     }
   }
 
-  return str.replace(/^@/, "");
+  return str
+    .replace(/^@/, "")
+    .replace(/^https?:\/\/github\.com\//i, "")
+    .replace(/\/+$/, "")
+    .split("/")[0]
+    .trim();
 };
 
 export default function ProfileSetupModal({ onClose }) {

@@ -5,6 +5,74 @@ import api from "../../api/client";
 import endpoints from "../../api/endpoints";
 import { useToast } from "../../context/ToastContext";
 
+const normalizeGithubUsername = (value) => {
+  const raw = (value || "").trim();
+  if (!raw) return "";
+
+  if (raw.includes("github.com")) {
+    try {
+      const url = new URL(raw.startsWith("http") ? raw : `https://${raw}`);
+      const parts = url.pathname.split("/").filter(Boolean);
+      return parts[0] || "";
+    } catch {
+      return raw
+        .replace(/^@/, "")
+        .replace(/^https?:\/\/github\.com\//i, "")
+        .replace(/\/+$/, "")
+        .split("/")[0]
+        .trim();
+    }
+  }
+
+  return raw
+    .replace(/^@/, "")
+    .replace(/^https?:\/\/github\.com\//i, "")
+    .replace(/\/+$/, "")
+    .split("/")[0]
+    .trim();
+};
+
+const normalizeLeetcodeUsername = (value) => {
+  const raw = (value || "").trim();
+  if (!raw) return "";
+
+  if (raw.includes("leetcode.com")) {
+    try {
+      const url = new URL(raw.startsWith("http") ? raw : `https://${raw}`);
+      const parts = url.pathname.split("/").filter(Boolean);
+      if (parts[0] === "u" && parts[1]) return parts[1];
+      if (parts.length >= 1) return parts[parts.length - 1];
+      return "";
+    } catch {
+      return raw
+        .replace(/^@/, "")
+        .replace(/^https?:\/\/leetcode\.com\//i, "")
+        .replace(/^u\//i, "")
+        .replace(/\/+$/, "")
+        .split("/")[0]
+        .trim();
+    }
+  }
+
+  return raw
+    .replace(/^@/, "")
+    .replace(/^https?:\/\/leetcode\.com\//i, "")
+    .replace(/^u\//i, "")
+    .replace(/\/+$/, "")
+    .split("/")[0]
+    .trim();
+};
+
+const getGithubProfileUrl = (value) => {
+  const username = normalizeGithubUsername(value);
+  return username ? `https://github.com/${username}` : null;
+};
+
+const getLeetcodeProfileUrl = (value) => {
+  const username = normalizeLeetcodeUsername(value);
+  return username ? `https://leetcode.com/u/${username}` : null;
+};
+
 export default function StudentDetailsViewer() {
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -163,26 +231,28 @@ export default function StudentDetailsViewer() {
   };
 
   const handleShowRepos = async (student) => {
-    if (!student.githubUsername) {
+    const githubUsername = normalizeGithubUsername(student.githubUsername);
+
+    if (!githubUsername) {
       toast.error("This student does not have a linked GitHub username.");
       return;
     }
 
-    setRepoStudent(student);
+    setRepoStudent({ ...student, githubUsername });
     setRepoLoading(true);
     setRepoError("");
     setRepoModalOpen(true);
 
     try {
       const response = await fetch(
-        `https://api.github.com/users/${encodeURIComponent(student.githubUsername)}/repos?per_page=100&sort=updated`
+        `https://api.github.com/users/${encodeURIComponent(githubUsername)}/repos?per_page=100&sort=updated`
       );
       if (!response.ok) {
         const message = response.status === 404 ? "GitHub user not found." : "Failed to fetch repos.";
         throw new Error(message);
       }
       const data = await response.json();
-      setRepos(data || []);
+      setRepos(Array.isArray(data) ? data : []);
     } catch (err) {
       setRepoError(err.message || "Failed to fetch repos.");
     } finally {
@@ -233,7 +303,9 @@ export default function StudentDetailsViewer() {
                   <th className="py-2 px-3 text-left text-dark-300">LeetCode</th>
                   <th className="py-2 px-3 text-left text-dark-300">Git</th>
                   <th className="py-2 px-3 text-left text-dark-300">Completed</th>
-                  <th className="py-2 px-3 text-left text-dark-300">Regs</th>
+                  <th className="py-2 px-3 text-left text-dark-300">Hackathons</th>
+                  <th className="py-2 px-3 text-left text-dark-300">Internships</th>
+                  <th className="py-2 px-3 text-left text-dark-300">Courses</th>
                   <th className="py-2 px-3 text-left text-dark-300">Impositions</th>
                   <th className="py-2 px-3 text-left text-dark-300">Actions</th>
                 </tr>
@@ -276,9 +348,9 @@ export default function StudentDetailsViewer() {
                           />
                         </td>
                         <td className="py-2 px-3 text-dark-300">{student.completedCount || 0}</td>
-                        <td className="py-2 px-3 text-dark-300">
-                          {(student.hackathonCount || 0) + (student.internshipCount || 0) + (student.courseCount || 0)}
-                        </td>
+                        <td className="py-2 px-3 text-dark-300">{student.hackathonCount || 0}</td>
+                        <td className="py-2 px-3 text-dark-300">{student.internshipCount || 0}</td>
+                        <td className="py-2 px-3 text-dark-300">{student.courseCount || 0}</td>
                         <td className="py-2 px-3 text-dark-300">{student.impositionCount || 0}</td>
                         <td className="py-2 px-3">
                           <div className="flex gap-2">
@@ -295,12 +367,38 @@ export default function StudentDetailsViewer() {
                       <>
                         <td className="py-2 px-3 text-white font-medium">{student.username || "—"}</td>
                         <td className="py-2 px-3 text-dark-300">{student.year || "—"}</td>
-                        <td className="py-2 px-3 text-dark-300">{student.leetcodeUsername || "—"}</td>
-                        <td className="py-2 px-3 text-dark-300">{student.githubUsername || "—"}</td>
-                        <td className="py-2 px-3 text-green-400">{student.completedCount || 0}</td>
                         <td className="py-2 px-3 text-dark-300">
-                          {(student.hackathonCount || 0) + (student.internshipCount || 0) + (student.courseCount || 0)}
+                          {student.leetcodeUsername ? (
+                            <a
+                              href={getLeetcodeProfileUrl(student.leetcodeUsername)}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="text-primary-300 hover:text-primary-200 underline underline-offset-2"
+                            >
+                              {normalizeLeetcodeUsername(student.leetcodeUsername)}
+                            </a>
+                          ) : (
+                            "—"
+                          )}
                         </td>
+                        <td className="py-2 px-3 text-dark-300">
+                          {student.githubUsername ? (
+                            <a
+                              href={getGithubProfileUrl(student.githubUsername)}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="text-primary-300 hover:text-primary-200 underline underline-offset-2"
+                            >
+                              {normalizeGithubUsername(student.githubUsername)}
+                            </a>
+                          ) : (
+                            "—"
+                          )}
+                        </td>
+                        <td className="py-2 px-3 text-green-400">{student.completedCount || 0}</td>
+                        <td className="py-2 px-3 text-dark-300">{student.hackathonCount || 0}</td>
+                        <td className="py-2 px-3 text-dark-300">{student.internshipCount || 0}</td>
+                        <td className="py-2 px-3 text-dark-300">{student.courseCount || 0}</td>
                         <td className="py-2 px-3 text-red-400">{student.impositionCount || 0}</td>
                         <td className="py-2 px-3">
                           <div className="flex flex-col gap-1">
@@ -355,7 +453,7 @@ export default function StudentDetailsViewer() {
           <div className="w-full max-w-2xl rounded-2xl bg-slate-950 p-6 shadow-2xl">
             <div className="flex items-center justify-between gap-4 pb-4 border-b border-white/10">
               <div>
-                <h3 className="text-xl font-semibold text-white">{repoStudent?.githubUsername}'s GitHub repos</h3>
+                <h3 className="text-xl font-semibold text-white">{normalizeGithubUsername(repoStudent?.githubUsername)}'s GitHub repos</h3>
                 <p className="text-sm text-dark-300">Showing public repos from GitHub.</p>
               </div>
               <button
