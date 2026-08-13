@@ -1,3 +1,7 @@
+function isDeadlineExpired(endTime) {
+  return new Date(endTime).getTime() < Date.now();
+}
+
 export default function ChallengeHistory({ challenges }) {
   if (!challenges || challenges.length === 0) {
     return <p className="text-dark-400 text-sm py-4">No past challenges.</p>;
@@ -5,15 +9,24 @@ export default function ChallengeHistory({ challenges }) {
 
   return (
     <div className="space-y-2 max-h-96 overflow-y-auto pr-1">
-      {challenges.map((challenge) => (
+      {challenges.map((challenge) => {
+        const isExpired = isDeadlineExpired(challenge.endTime);
+        const displayStatus =
+          challenge.status === "COMPLETED"
+            ? "COMPLETED"
+            : challenge.status === "NOT_COMPLETED" && isExpired
+            ? "MISSED"
+            : "PENDING";
+
+        return (
         <div
           key={challenge.id}
           className={`p-3 rounded-lg border ${
-            challenge.status === "COMPLETED"
+            displayStatus === "COMPLETED"
               ? "bg-green-500/5 border-green-500/20"
-              : challenge.status === "NOT_COMPLETED"
-                ? "bg-red-500/5 border-red-500/20"
-                : "bg-yellow-500/5 border-yellow-500/20"
+              : displayStatus === "MISSED"
+              ? "bg-red-500/5 border-red-500/20"
+              : "bg-yellow-500/5 border-yellow-500/20"
           }`}
         >
           <div className="flex justify-between items-start gap-2">
@@ -26,9 +39,9 @@ export default function ChallengeHistory({ challenges }) {
               </div>
             </div>
             <div className="text-right shrink-0">
-              {challenge.status === "COMPLETED" ? (
+              {displayStatus === "COMPLETED" ? (
                 <span className="text-[10px] text-green-400 font-medium">✓ Done</span>
-              ) : challenge.status === "NOT_COMPLETED" ? (
+              ) : displayStatus === "MISSED" ? (
                 <span className="text-[10px] text-red-400 font-medium">✗ Missed</span>
               ) : (
                 <span className="text-[10px] text-yellow-400 font-medium">Pending</span>
@@ -39,7 +52,8 @@ export default function ChallengeHistory({ challenges }) {
             </div>
           </div>
         </div>
-      ))}
+        );
+      })}
     </div>
   );
 }

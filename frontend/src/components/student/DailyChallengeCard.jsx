@@ -62,36 +62,36 @@ export default function DailyChallengeCard({ challenge, status, completedAt, lan
   };
 
   return (
-    <div className="glass-card challenge-card">
-      <div className="grid md:grid-cols-2 gap-8 items-center w-full">
+    <div className="glass-card challenge-card p-4">
+      <div className="grid md:grid-cols-2 gap-4 items-center w-full">
         {/* Left: Problem details */}
         <div>
-          <div className="flex items-center gap-3 mb-3">
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary-500 to-secondary-500 flex items-center justify-center shadow-glow">
-              <Code2 className="w-8 h-8 text-white" />
+          <div className="flex items-center gap-2 mb-2">
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary-500 to-secondary-500 flex items-center justify-center shadow-glow">
+              <Code2 className="w-5 h-5 text-white" />
             </div>
             <div>
-              <div className="flex items-center gap-2 text-dark-300 text-sm">
-                <BookOpen className="w-4 h-4" />
+              <div className="flex items-center gap-2 text-dark-300 text-xs">
+                <BookOpen className="w-3 h-3" />
                 LeetCode Challenge
               </div>
-              <h3 className="text-3xl font-bold text-white">#{challenge.leetcodeNumber}</h3>
+              <h3 className="text-lg font-bold text-white">#{challenge.leetcodeNumber}</h3>
             </div>
           </div>
 
-          <p className="text-lg text-dark-200 mb-2">{challenge.leetcodeTitle}</p>
+          <p className="text-sm text-dark-200 mb-2">{challenge.leetcodeTitle}</p>
 
           {status === "COMPLETED" ? (
-            <div className="text-green-400 font-medium flex items-center gap-2 mt-3">
-              <CheckCircle className="w-5 h-5" />
+            <div className="text-green-400 font-medium flex items-center gap-2 mt-2 text-sm">
+              <CheckCircle className="w-4 h-4" />
               Completed{language ? ` in ${language}` : ""}
               {completedAt ? ` · ${new Date(completedAt).toLocaleString()}` : ""}
             </div>
           ) : status === "NOT_COMPLETED" ? (
-            <div className="text-red-400 font-medium mt-3">✗ Not Completed</div>
+            <div className="text-red-400 font-medium mt-2 text-sm">✗ Not Completed</div>
           ) : (
-            <div className="text-yellow-400 font-medium mt-3">● Pending</div>
-          )}
+            <div className="text-yellow-400 font-medium mt-2 text-sm">● Pending</div>
+          )}  
         </div>
 
         {/* Right: Big Countdown */}
@@ -112,3 +112,4 @@ export default function DailyChallengeCard({ challenge, status, completedAt, lan
     </div>
   );
 }
+

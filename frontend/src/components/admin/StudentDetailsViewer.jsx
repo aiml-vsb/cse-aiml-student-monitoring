@@ -450,44 +450,43 @@ export default function StudentDetailsViewer() {
 
       {repoModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
-          <div className="w-full max-w-2xl rounded-2xl bg-slate-950 p-6 shadow-2xl">
-            <div className="flex items-center justify-between gap-4 pb-4 border-b border-white/10">
-              <div>
-                <h3 className="text-xl font-semibold text-white">{normalizeGithubUsername(repoStudent?.githubUsername)}'s GitHub repos</h3>
-                <p className="text-sm text-dark-300">Showing public repos from GitHub.</p>
+          <div className="w-full max-w-xl max-h-[70vh] rounded-xl bg-slate-950 shadow-2xl flex flex-col">
+            <div className="flex items-center justify-between gap-3 px-4 py-3 border-b border-white/10 flex-shrink-0">
+              <div className="min-w-0">
+                <h3 className="text-lg font-semibold text-white truncate">{normalizeGithubUsername(repoStudent?.githubUsername)}'s repos</h3>
               </div>
               <button
                 onClick={handleCloseRepoModal}
-                className="rounded-lg bg-white/10 px-2.5 py-1.5 text-xs font-medium text-white hover:bg-white/20"
+                className="rounded-lg bg-white/10 px-2 py-1.5 text-xs font-medium text-white hover:bg-white/20 flex-shrink-0"
               >
-                Close
+                ✕
               </button>
             </div>
 
-            <div className="mt-4 space-y-4">
+            <div className="flex-1 overflow-y-auto px-4 py-3">
               {repoLoading ? (
-                <div className="flex justify-center py-10">
-                  <Loader className="w-8 h-8 animate-spin text-primary-400" />
+                <div className="flex justify-center py-8">
+                  <Loader className="w-6 h-6 animate-spin text-primary-400" />
                 </div>
               ) : repoError ? (
-                <div className="rounded-xl bg-red-500/10 p-4 text-red-200">{repoError}</div>
+                <div className="rounded-lg bg-red-500/10 p-3 text-red-200 text-sm">{repoError}</div>
               ) : repos.length === 0 ? (
-                <div className="rounded-xl bg-white/5 p-4 text-dark-300">No repositories found.</div>
+                <div className="rounded-lg bg-white/5 p-3 text-dark-300 text-sm">No repositories found.</div>
               ) : (
-                <div className="grid gap-3">
+                <div className="space-y-2">
                   {repos.map((repo) => (
                     <a
                       key={repo.id}
                       href={repo.html_url}
                       target="_blank"
                       rel="noreferrer"
-                      className="rounded-2xl border border-white/10 bg-slate-900 p-4 transition hover:border-primary-400"
+                      className="block rounded-lg border border-white/10 bg-slate-900/50 p-2.5 transition hover:border-primary-400 hover:bg-slate-900/80"
                     >
-                      <div className="flex items-center justify-between gap-4">
-                        <h4 className="text-base font-semibold text-white">{repo.name}</h4>
-                        <span className="text-sm text-dark-300">{repo.language || "—"}</span>
+                      <div className="flex items-start justify-between gap-2">
+                        <h4 className="text-sm font-semibold text-white truncate flex-1">{repo.name}</h4>
+                        {repo.language && <span className="text-xs text-dark-400 flex-shrink-0">{repo.language}</span>}
                       </div>
-                      <p className="mt-2 text-sm text-dark-300">{repo.description || "No description provided."}</p>
+                      {repo.description && <p className="mt-1 text-xs text-dark-300 line-clamp-2">{repo.description}</p>}
                     </a>
                   ))}
                 </div>

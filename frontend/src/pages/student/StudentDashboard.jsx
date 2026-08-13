@@ -225,12 +225,12 @@ export default function StudentDashboard() {
           </aside>
 
           <main className="lg:col-span-3 space-y-8">
-            <section>
-              <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-                <Code2 className="w-5 h-5 text-primary-400" />
-                LeetCode for the Day
-              </h2>
-              {activeChallenge?.active ? (
+            {activeChallenge?.active && activeChallenge?.status !== "COMPLETED" && (
+              <section>
+                <h2 className="text-lg font-bold text-white mb-3 flex items-center gap-2">
+                  <Code2 className="w-4 h-4 text-primary-400" />
+                  LeetCode for the Day
+                </h2>
                 <DailyChallengeCard
                   challenge={activeChallenge.challenge}
                   status={activeChallenge.status}
@@ -238,12 +238,8 @@ export default function StudentDashboard() {
                   language={activeChallenge.language}
                   onComplete={fetchData}
                 />
-              ) : (
-                <div className="glass-card p-6 text-center text-dark-400">
-                  No active challenge right now. Check back later!
-                </div>
-              )}
-            </section>
+              </section>
+            )}
 
             {renderSelectedCategory()}
           </main>
