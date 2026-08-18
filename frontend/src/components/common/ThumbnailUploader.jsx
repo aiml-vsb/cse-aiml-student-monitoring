@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import { CheckCircle, XCircle, Upload, Link2, Loader } from "lucide-react";
+import { CheckCircle, XCircle, Upload, Link2, Loader2 } from "lucide-react";
 
 export default function ThumbnailUploader({
   label = "Thumbnail",
@@ -8,7 +8,7 @@ export default function ThumbnailUploader({
 }) {
   const [url, setUrl] = useState(value && value.startsWith("http") ? value : "");
   const [checking, setChecking] = useState(false);
-  const [checkResult, setCheckResult] = useState(null); // { ok: boolean, msg: string }
+  const [checkResult, setCheckResult] = useState(null);
   const fileRef = useRef();
 
   const handleCheck = () => {
@@ -37,7 +37,7 @@ export default function ThumbnailUploader({
       setChecking(false);
       setCheckResult({
         ok: false,
-        msg: "URL does not point to a valid image. You can upload one below.",
+        msg: "URL does not point to a valid image.",
       });
     };
 
@@ -79,7 +79,7 @@ export default function ThumbnailUploader({
     <div>
       {label && <label className="label-dark">{label}</label>}
 
-      <div className="flex gap-2">
+      <div className="flex gap-2.5">
         <input
           type="text"
           value={url}
@@ -91,20 +91,20 @@ export default function ThumbnailUploader({
           type="button"
           onClick={handleCheck}
           disabled={checking}
-          className="btn-secondary whitespace-nowrap"
+          className="btn-secondary whitespace-nowrap py-2"
         >
-          {checking ? <Loader className="w-4 h-4 animate-spin" /> : <Link2 className="w-4 h-4 mr-1" />}
+          {checking ? <Loader2 className="w-4 h-4 animate-spin" /> : <Link2 className="w-4 h-4 mr-1" />}
           Check
         </button>
       </div>
 
-      <div className="flex items-center gap-2 mt-2">
+      <div className="flex items-center gap-3 mt-2.5">
         <button
           type="button"
           onClick={() => fileRef.current?.click()}
-          className="btn-secondary whitespace-nowrap"
+          className="btn-secondary whitespace-nowrap py-1.5 px-3 text-xs"
         >
-          <Upload className="w-4 h-4 mr-1" />
+          <Upload className="w-3.5 h-3.5 mr-1" />
           Upload Photo
         </button>
         <input
@@ -116,11 +116,11 @@ export default function ThumbnailUploader({
         />
 
         {checkResult && (
-          <span className={`text-sm ${checkResult.ok ? "text-green-400" : "text-red-400"}`}>
+          <span className={`text-xs font-semibold flex items-center gap-1 ${checkResult.ok ? "text-emerald-600" : "text-red-500"}`}>
             {checkResult.ok ? (
-              <CheckCircle className="w-4 h-4 inline mr-1" />
+              <CheckCircle className="w-3.5 h-3.5" />
             ) : (
-              <XCircle className="w-4 h-4 inline mr-1" />
+              <XCircle className="w-3.5 h-3.5" />
             )}
             {checkResult.msg}
           </span>
@@ -128,7 +128,7 @@ export default function ThumbnailUploader({
       </div>
 
       {(value?.startsWith("data:image") || value?.startsWith("http")) && (
-        <div className="mt-3">
+        <div className="mt-3 card-image-wrapper">
           <img
             src={value}
             alt="Preview"

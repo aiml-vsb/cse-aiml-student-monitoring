@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import { Users, Trash2, Loader, Edit2, Check, X, Download } from "lucide-react";
+import { Users, Trash2, Edit2, Check, X, Download, Github, Code2, ExternalLink } from "lucide-react";
 import api from "../../api/client";
 import endpoints from "../../api/endpoints";
+import Loader from "../common/Loader";
 import { useToast } from "../../context/ToastContext";
 
 const normalizeGithubUsername = (value) => {
@@ -139,7 +140,7 @@ export default function StudentDetailsViewer() {
   }, [location, toast]);
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this student and all their data?")) return;
+    if (!window.confirm("Are you sure you want to delete this student and all their records?")) return;
     try {
       const { data } = await api.delete(endpoints.studentById(id));
       toast.success(data.message || "Student deleted");
@@ -171,7 +172,7 @@ export default function StudentDetailsViewer() {
   const handleSaveEdit = async (id) => {
     try {
       const { data } = await api.put(endpoints.studentById(id), editData);
-      toast.success(data.message || "Student updated");
+      toast.success(data.message || "Student updated successfully");
       setEditingId(null);
       await fetchStudents();
     } catch (err) {
@@ -189,7 +190,7 @@ export default function StudentDetailsViewer() {
       document.body.appendChild(link);
       link.click();
       window.URL.revokeObjectURL(url);
-      toast.success("Excel exported!");
+      toast.success("Excel exported successfully!");
     } catch (err) {
       toast.error(err.response?.data?.message || "Export failed");
     }
@@ -205,7 +206,7 @@ export default function StudentDetailsViewer() {
       document.body.appendChild(link);
       link.click();
       window.URL.revokeObjectURL(url);
-      toast.success("PPT exported!");
+      toast.success("PPT exported successfully!");
     } catch (err) {
       toast.error(err.response?.data?.message || "Export failed");
     }
@@ -270,94 +271,99 @@ export default function StudentDetailsViewer() {
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap justify-between items-center gap-4">
-        <h2 className="text-2xl font-bold text-white flex items-center gap-2">
-          <Users className="w-6 h-6 text-primary-400" />
-          Student Details
-        </h2>
-        <div className="flex gap-2">
-          <button onClick={handleExportExcel} className="btn-primary">
-            <Download className="w-4 h-4 mr-1" />
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-[#e0e5ec] shadow-neu-flat-sm flex items-center justify-center border border-white/80 shrink-0">
+            <Users className="w-5 h-5 text-blue-600" />
+          </div>
+          <div>
+            <h2 className="text-xl font-extrabold text-dark-800 tracking-tight">Student Academic Directory</h2>
+            <p className="text-xs text-dark-400 font-semibold">Monitor GitHub, LeetCode submissions, event enrollments, and penalties.</p>
+          </div>
+        </div>
+        <div className="flex gap-2.5">
+          <button onClick={handleExportExcel} className="btn-secondary text-xs font-bold py-2.5 px-4 flex items-center gap-1.5">
+            <Download className="w-3.5 h-3.5 text-emerald-600" />
             Export Excel
           </button>
-          <button onClick={handleExportPPT} className="btn-secondary">
-            <Download className="w-4 h-4 mr-1" />
+          <button onClick={handleExportPPT} className="btn-secondary text-xs font-bold py-2.5 px-4 flex items-center gap-1.5">
+            <Download className="w-3.5 h-3.5 text-indigo-600" />
             Export PPT
           </button>
         </div>
       </div>
 
       {loading ? (
-        <div className="flex justify-center py-12">
-          <Loader className="w-8 h-8 animate-spin text-primary-400" />
+        <div className="flex justify-center py-16">
+          <Loader size="lg" text="Loading student directory..." />
         </div>
       ) : students.length === 0 ? (
-        <div className="text-center py-12 text-dark-400">No students registered yet</div>
+        <div className="neu-card p-12 text-center text-dark-400 font-semibold text-sm">No students registered yet.</div>
       ) : (
-        <div className="glass-card p-6">
+        <div className="neu-card p-6 md:p-8">
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+            <table className="w-full text-xs">
               <thead>
-                <tr className="border-b border-white/10">
-                  <th className="py-2 px-3 text-left text-dark-300">Student</th>
-                  <th className="py-2 px-3 text-left text-dark-300">Year</th>
-                  <th className="py-2 px-3 text-left text-dark-300">LeetCode</th>
-                  <th className="py-2 px-3 text-left text-dark-300">Git</th>
-                  <th className="py-2 px-3 text-left text-dark-300">Completed</th>
-                  <th className="py-2 px-3 text-left text-dark-300">Hackathons</th>
-                  <th className="py-2 px-3 text-left text-dark-300">Internships</th>
-                  <th className="py-2 px-3 text-left text-dark-300">Courses</th>
-                  <th className="py-2 px-3 text-left text-dark-300">Impositions</th>
-                  <th className="py-2 px-3 text-left text-dark-300">Actions</th>
+                <tr className="border-b border-dark-300/40 text-dark-400 uppercase tracking-wider font-extrabold text-[11px]">
+                  <th className="py-3 px-3 text-left">Student</th>
+                  <th className="py-3 px-3 text-left">Year</th>
+                  <th className="py-3 px-3 text-left">LeetCode</th>
+                  <th className="py-3 px-3 text-left">GitHub</th>
+                  <th className="py-3 px-3 text-center">LC Solved</th>
+                  <th className="py-3 px-3 text-center">Hackathons</th>
+                  <th className="py-3 px-3 text-center">Internships</th>
+                  <th className="py-3 px-3 text-center">Courses</th>
+                  <th className="py-3 px-3 text-center">Impositions</th>
+                  <th className="py-3 px-3 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="divide-y divide-dark-200/30">
                 {students.map((student) => (
-                  <tr key={student.id} className="border-b border-white/5 hover:bg-white/5">
+                  <tr key={student.id} className="hover:bg-white/40 transition-colors">
                     {editingId === student.id ? (
                       <>
-                        <td className="py-2 px-3">
+                        <td className="py-3 px-2">
                           <input
                             name="username"
                             value={editData.username}
                             onChange={handleEditChange}
-                            className="input-dark py-1"
+                            className="neu-input py-1.5 text-xs"
                           />
                         </td>
-                        <td className="py-2 px-3">
-                          <select name="year" value={editData.year} onChange={handleEditChange} className="input-dark py-1">
+                        <td className="py-3 px-2">
+                          <select name="year" value={editData.year} onChange={handleEditChange} className="neu-input py-1.5 text-xs">
                             <option value="1st Year">1st Year</option>
                             <option value="2nd Year">2nd Year</option>
                             <option value="3rd Year">3rd Year</option>
                             <option value="4th Year">4th Year</option>
                           </select>
                         </td>
-                        <td className="py-2 px-3">
+                        <td className="py-3 px-2">
                           <input
                             name="leetcodeUsername"
                             value={editData.leetcodeUsername}
                             onChange={handleEditChange}
-                            className="input-dark py-1"
+                            className="neu-input py-1.5 text-xs"
                           />
                         </td>
-                        <td className="py-2 px-3">
+                        <td className="py-3 px-2">
                           <input
                             name="githubUsername"
                             value={editData.githubUsername}
                             onChange={handleEditChange}
-                            className="input-dark py-1"
+                            className="neu-input py-1.5 text-xs"
                           />
                         </td>
-                        <td className="py-2 px-3 text-dark-300">{student.completedCount || 0}</td>
-                        <td className="py-2 px-3 text-dark-300">{student.hackathonCount || 0}</td>
-                        <td className="py-2 px-3 text-dark-300">{student.internshipCount || 0}</td>
-                        <td className="py-2 px-3 text-dark-300">{student.courseCount || 0}</td>
-                        <td className="py-2 px-3 text-dark-300">{student.impositionCount || 0}</td>
-                        <td className="py-2 px-3">
-                          <div className="flex gap-2">
-                            <button onClick={() => handleSaveEdit(student.id)} className="p-1 rounded hover:bg-green-500/10 text-green-400">
+                        <td className="py-3 px-3 text-center text-dark-500 font-bold">{student.completedCount || 0}</td>
+                        <td className="py-3 px-3 text-center text-dark-500 font-bold">{student.hackathonCount || 0}</td>
+                        <td className="py-3 px-3 text-center text-dark-500 font-bold">{student.internshipCount || 0}</td>
+                        <td className="py-3 px-3 text-center text-dark-500 font-bold">{student.courseCount || 0}</td>
+                        <td className="py-3 px-3 text-center text-dark-500 font-bold">{student.impositionCount || 0}</td>
+                        <td className="py-3 px-3 text-right">
+                          <div className="inline-flex items-center gap-1.5">
+                            <button onClick={() => handleSaveEdit(student.id)} className="p-1.5 rounded-lg text-emerald-700 hover:shadow-neu-btn" title="Save">
                               <Check className="w-4 h-4" />
                             </button>
-                            <button onClick={() => setEditingId(null)} className="p-1 rounded hover:bg-red-500/10 text-red-400">
+                            <button onClick={() => setEditingId(null)} className="p-1.5 rounded-lg text-red-500 hover:shadow-neu-btn" title="Cancel">
                               <X className="w-4 h-4" />
                             </button>
                           </div>
@@ -365,78 +371,82 @@ export default function StudentDetailsViewer() {
                       </>
                     ) : (
                       <>
-                        <td className="py-2 px-3 text-white font-medium">{student.username || "—"}</td>
-                        <td className="py-2 px-3 text-dark-300">{student.year || "—"}</td>
-                        <td className="py-2 px-3 text-dark-300">
+                        <td className="py-3.5 px-3 font-bold text-dark-800">{student.username || "—"}</td>
+                        <td className="py-3.5 px-3 text-dark-500 font-medium">{student.year || "—"}</td>
+                        <td className="py-3.5 px-3">
                           {student.leetcodeUsername ? (
                             <a
                               href={getLeetcodeProfileUrl(student.leetcodeUsername)}
                               target="_blank"
                               rel="noreferrer"
-                              className="text-primary-300 hover:text-primary-200 underline underline-offset-2"
+                              className="text-indigo-600 hover:text-indigo-800 font-bold inline-flex items-center gap-1"
                             >
+                              <Code2 className="w-3 h-3 text-dark-400" />
                               {normalizeLeetcodeUsername(student.leetcodeUsername)}
                             </a>
                           ) : (
-                            "—"
+                            <span className="text-dark-400">—</span>
                           )}
                         </td>
-                        <td className="py-2 px-3 text-dark-300">
+                        <td className="py-3.5 px-3">
                           {student.githubUsername ? (
                             <a
                               href={getGithubProfileUrl(student.githubUsername)}
                               target="_blank"
                               rel="noreferrer"
-                              className="text-primary-300 hover:text-primary-200 underline underline-offset-2"
+                              className="text-indigo-600 hover:text-indigo-800 font-bold inline-flex items-center gap-1"
                             >
+                              <Github className="w-3 h-3 text-dark-400" />
                               {normalizeGithubUsername(student.githubUsername)}
                             </a>
                           ) : (
-                            "—"
+                            <span className="text-dark-400">—</span>
                           )}
                         </td>
-                        <td className="py-2 px-3 text-green-400">{student.completedCount || 0}</td>
-                        <td className="py-2 px-3 text-dark-300">{student.hackathonCount || 0}</td>
-                        <td className="py-2 px-3 text-dark-300">{student.internshipCount || 0}</td>
-                        <td className="py-2 px-3 text-dark-300">{student.courseCount || 0}</td>
-                        <td className="py-2 px-3 text-red-400">{student.impositionCount || 0}</td>
-                        <td className="py-2 px-3">
-                          <div className="flex flex-col gap-1">
-                            <div className="flex gap-2 items-center">
-                              <button
-                                onClick={() =>
-                                  student.githubUsername
-                                    ? handleShowRepos(student)
-                                    : handleAuthorizeStudent(student.id)
-                                }
-                                disabled={!!authLoadingByStudent[student.id]}
-                                className={`rounded-md border px-2.5 py-1.5 text-xs font-medium transition ${
-                                  student.githubUsername
-                                    ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20"
-                                    : authErrorByStudent[student.id]
-                                    ? "border-red-500/40 bg-red-500/10 text-red-300 hover:bg-red-500/20"
-                                    : "border-white/10 bg-black text-white hover:bg-neutral-800"
-                                } ${authLoadingByStudent[student.id] ? "opacity-70 cursor-not-allowed" : ""}`}
-                              >
-                                {authLoadingByStudent[student.id]
-                                  ? "Processing..."
-                                  : student.githubUsername
-                                  ? "Show Repos"
-                                  : authErrorByStudent[student.id]
-                                  ? "Retry"
-                                  : "GitHub"}
-                              </button>
-                              <button onClick={() => handleEdit(student)} className="p-1 rounded hover:bg-white/10 text-primary-400">
-                                <Edit2 className="w-4 h-4" />
-                              </button>
-                              <button onClick={() => handleDelete(student.id)} className="p-1 rounded hover:bg-red-500/10 text-red-400">
-                                <Trash2 className="w-4 h-4" />
-                              </button>
-                            </div>
-                            {authErrorByStudent[student.id] && (
-                              <div className="text-xs text-red-400">{authErrorByStudent[student.id]}</div>
-                            )}
+                        <td className="py-3.5 px-3 text-center">
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-extrabold bg-emerald-500/15 text-emerald-700 shadow-neu-inset-sm">
+                            {student.completedCount || 0}
+                          </span>
+                        </td>
+                        <td className="py-3.5 px-3 text-center font-bold text-dark-700">{student.hackathonCount || 0}</td>
+                        <td className="py-3.5 px-3 text-center font-bold text-dark-700">{student.internshipCount || 0}</td>
+                        <td className="py-3.5 px-3 text-center font-bold text-dark-700">{student.courseCount || 0}</td>
+                        <td className="py-3.5 px-3 text-center">
+                          {student.impositionCount > 0 ? (
+                            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-extrabold bg-red-500/15 text-red-600 shadow-neu-inset-sm">
+                              {student.impositionCount}
+                            </span>
+                          ) : (
+                            <span className="text-dark-400 font-medium">0</span>
+                          )}
+                        </td>
+                        <td className="py-3.5 px-3 text-right">
+                          <div className="inline-flex items-center gap-1.5">
+                            <button
+                              onClick={() =>
+                                student.githubUsername
+                                  ? handleShowRepos(student)
+                                  : handleAuthorizeStudent(student.id)
+                              }
+                              disabled={!!authLoadingByStudent[student.id]}
+                              className="btn-secondary text-[11px] font-bold py-1.5 px-2.5 flex items-center gap-1"
+                            >
+                              {authLoadingByStudent[student.id]
+                                ? "Processing..."
+                                : student.githubUsername
+                                ? "Repos"
+                                : "Auth"}
+                            </button>
+                            <button onClick={() => handleEdit(student)} className="p-1.5 rounded-xl text-dark-500 hover:text-indigo-600 hover:shadow-neu-btn active:shadow-neu-inset transition-all" title="Edit">
+                              <Edit2 className="w-3.5 h-3.5" />
+                            </button>
+                            <button onClick={() => handleDelete(student.id)} className="p-1.5 rounded-xl text-dark-500 hover:text-red-600 hover:shadow-neu-btn active:shadow-neu-inset transition-all" title="Delete">
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
                           </div>
+                          {authErrorByStudent[student.id] && (
+                            <div className="text-[10px] text-red-500 font-bold mt-1">{authErrorByStudent[student.id]}</div>
+                          )}
                         </td>
                       </>
                     )}
@@ -449,53 +459,60 @@ export default function StudentDetailsViewer() {
       )}
 
       {repoModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
-          <div className="w-full max-w-xl max-h-[70vh] rounded-xl bg-slate-950 shadow-2xl flex flex-col">
-            <div className="flex items-center justify-between gap-3 px-4 py-3 border-b border-white/10 flex-shrink-0">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/30 backdrop-blur-md p-4">
+          <div className="neu-card w-full max-w-xl max-h-[75vh] flex flex-col shadow-neu-flat-lg border border-white/80 p-6">
+            <div className="flex items-center justify-between gap-3 pb-4 border-b border-white/60 flex-shrink-0">
               <div className="min-w-0">
-                <h3 className="text-lg font-semibold text-white truncate">{normalizeGithubUsername(repoStudent?.githubUsername)}'s repos</h3>
+                <h3 className="text-base font-extrabold text-dark-800 truncate flex items-center gap-2">
+                  <Github className="w-4 h-4 text-indigo-600" />
+                  <span>{normalizeGithubUsername(repoStudent?.githubUsername)}'s Repositories</span>
+                </h3>
               </div>
               <button
                 onClick={handleCloseRepoModal}
-                className="rounded-lg bg-white/10 px-2 py-1.5 text-xs font-medium text-white hover:bg-white/20 flex-shrink-0"
+                className="w-8 h-8 rounded-xl bg-[#e0e5ec] shadow-neu-btn active:shadow-neu-inset flex items-center justify-center text-dark-500 hover:text-dark-800 transition-all"
               >
-                ✕
+                <X className="w-4 h-4" />
               </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto px-4 py-3">
+            <div className="flex-1 overflow-y-auto pt-4 space-y-2.5 pr-1">
               {repoLoading ? (
-                <div className="flex justify-center py-8">
-                  <Loader className="w-6 h-6 animate-spin text-primary-400" />
+                <div className="flex justify-center py-10">
+                  <Loader size="md" text="Fetching GitHub repos..." />
                 </div>
               ) : repoError ? (
-                <div className="rounded-lg bg-red-500/10 p-3 text-red-200 text-sm">{repoError}</div>
+                <div className="rounded-xl bg-red-500/10 p-3.5 text-red-600 text-xs font-bold border border-red-500/20">{repoError}</div>
               ) : repos.length === 0 ? (
-                <div className="rounded-lg bg-white/5 p-3 text-dark-300 text-sm">No repositories found.</div>
+                <div className="text-center py-8 text-dark-400 text-xs font-semibold">No public repositories found for this account.</div>
               ) : (
-                <div className="space-y-2">
-                  {repos.map((repo) => (
-                    <a
-                      key={repo.id}
-                      href={repo.html_url}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="block rounded-lg border border-white/10 bg-slate-900/50 p-2.5 transition hover:border-primary-400 hover:bg-slate-900/80"
-                    >
-                      <div className="flex items-start justify-between gap-2">
-                        <h4 className="text-sm font-semibold text-white truncate flex-1">{repo.name}</h4>
-                        {repo.language && <span className="text-xs text-dark-400 flex-shrink-0">{repo.language}</span>}
-                      </div>
-                      {repo.description && <p className="mt-1 text-xs text-dark-300 line-clamp-2">{repo.description}</p>}
-                    </a>
-                  ))}
-                </div>
+                repos.map((repo) => (
+                  <a
+                    key={repo.id}
+                    href={repo.html_url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="block p-3.5 rounded-xl bg-[#e0e5ec] shadow-neu-flat-sm hover:shadow-neu-flat border border-white/70 transition-all duration-200"
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <h4 className="text-xs font-bold text-dark-800 truncate flex-1 flex items-center gap-1.5">
+                        <ExternalLink className="w-3 h-3 text-indigo-600" />
+                        {repo.name}
+                      </h4>
+                      {repo.language && (
+                        <span className="text-[10px] font-extrabold text-indigo-600 bg-indigo-500/10 px-2 py-0.5 rounded-md shadow-neu-inset-sm">
+                          {repo.language}
+                        </span>
+                      )}
+                    </div>
+                    {repo.description && <p className="mt-1 text-[11px] text-dark-500 line-clamp-2 leading-relaxed">{repo.description}</p>}
+                  </a>
+                ))
               )}
             </div>
           </div>
         </div>
       )}
-
     </div>
   );
 }

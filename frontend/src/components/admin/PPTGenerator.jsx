@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { Sparkles, Loader, FileDown } from "lucide-react";
+import { Sparkles, FileDown, CheckCircle2 } from "lucide-react";
 import api from "../../api/client";
 import endpoints from "../../api/endpoints";
+import Loader from "../common/Loader";
 import { useToast } from "../../context/ToastContext";
 
 export default function PPTGenerator() {
@@ -15,11 +16,11 @@ export default function PPTGenerator() {
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement("a");
       link.href = url;
-      link.download = `student-report-${new Date().toISOString().slice(0, 10)}.pptx`;
+      link.download = `student-monitoring-report-${new Date().toISOString().slice(0, 10)}.pptx`;
       document.body.appendChild(link);
       link.click();
       window.URL.revokeObjectURL(url);
-      toast.success("PPT downloaded successfully!");
+      toast.success("Presentation generated and downloaded successfully!");
     } catch (err) {
       console.error("PPT generation failed:", err.response?.data || err.message);
       toast.error(err.response?.data?.message || "Failed to generate PPT");
@@ -28,38 +29,54 @@ export default function PPTGenerator() {
     }
   };
 
-  return (
-    <div className="space-y-6">
-      <div className="glass-card p-6">
-        <h2 className="text-2xl font-bold text-white flex items-center gap-2 mb-4">
-          <Sparkles className="w-6 h-6 text-secondary-400" />
-          Full PPT Report Generator
-        </h2>
+  const featurePoints = [
+    "Departmental Cover with College branding & accreditation badges",
+    "Real-time student participation and LeetCode completion metrics",
+    "Visual bar charts comparing progress across academic years",
+    "Complete breakdown of Hackathon and Internship event enrollments",
+    "Detailed Task and Lab assignment submission records",
+    "Top performing student leaderboard and honor roll",
+  ];
 
-        <p className="text-dark-300 mb-4">Download a professional PowerPoint file with:</p>
-        <ul className="list-disc pl-6 text-sm text-dark-300 mb-6 space-y-1">
-          <li>Cover page with VSB logo & accreditation</li>
-          <li>Overview statistics cards</li>
-          <li>Bar chart – student LeetCode completions</li>
-          <li>Table – hackathon / internship / registrations</li>
-          <li>Task completion report</li>
-          <li>Top performers leaderboard</li>
-        </ul>
+  return (
+    <div className="space-y-6 max-w-3xl">
+      <div className="neu-card p-8 md:p-10">
+        <div className="flex items-center gap-3 mb-6">
+          <div className="w-12 h-12 rounded-2xl bg-[#e0e5ec] shadow-neu-flat flex items-center justify-center border border-white/80 shrink-0">
+            <Sparkles className="w-6 h-6 text-orange-600" />
+          </div>
+          <div>
+            <h2 className="text-2xl font-extrabold text-dark-800 tracking-tight">
+              Executive Department PPT Deck Generator
+            </h2>
+            <p className="text-xs text-dark-400 font-semibold">Generate automated HOD & Management review slide presentations.</p>
+          </div>
+        </div>
+
+        <div className="neu-inset-panel p-6 mb-8 space-y-3">
+          <p className="text-xs font-bold text-dark-700 uppercase tracking-wider mb-2">Automated Slide Modules Included:</p>
+          {featurePoints.map((point, index) => (
+            <div key={index} className="flex items-start gap-2.5 text-xs text-dark-600 font-medium">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+              <span>{point}</span>
+            </div>
+          ))}
+        </div>
 
         <button
           onClick={handleGenerate}
           disabled={loading}
-          className="btn-primary px-8 py-3 text-lg disabled:opacity-50 w-full"
+          className="btn-primary w-full py-4 text-sm font-bold flex items-center justify-center gap-2 disabled:opacity-50"
         >
           {loading ? (
             <>
-              <Loader className="w-5 h-5 animate-spin mr-2" />
-              Generating PPT...
+              <div className="w-4 h-4 rounded-full border-2 border-white/40 border-t-white animate-spin" />
+              Compiling PowerPoint Presentation...
             </>
           ) : (
             <>
-              <FileDown className="w-5 h-5 mr-2" />
-              Download PPT
+              <FileDown className="w-5 h-5" />
+              Download Full PPTX Presentation Deck
             </>
           )}
         </button>

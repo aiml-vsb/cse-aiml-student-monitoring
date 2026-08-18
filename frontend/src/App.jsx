@@ -19,8 +19,11 @@ function ProtectedRoute({ children, allowedRoles }) {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-screen bg-dark-900">
-        <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary-500 border-t-transparent" />
+      <div className="flex flex-col items-center justify-center h-screen bg-[#e0e5ec] text-dark-500 font-bold">
+        <div className="w-12 h-12 rounded-2xl bg-[#e0e5ec] shadow-neu-flat flex items-center justify-center mb-3">
+          <div className="w-5 h-5 rounded-full border-2 border-indigo-600/30 border-t-indigo-600 animate-spin" />
+        </div>
+        <span className="text-xs uppercase tracking-widest text-dark-400">Authenticating...</span>
       </div>
     );
   }

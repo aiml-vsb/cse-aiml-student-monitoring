@@ -8,6 +8,8 @@ import {
   TrendingUp,
   Users,
   ShieldCheck,
+  ArrowRight,
+  Sparkles,
 } from "lucide-react";
 import AnimatedBackground from "../components/common/AnimatedBackground";
 
@@ -16,112 +18,142 @@ export default function Landing() {
     {
       icon: Code2,
       title: "Daily LeetCode Challenges",
-      desc: "Track daily LeetCode questions with automatic verification",
+      desc: "Track daily LeetCode questions with automatic verification and streak records.",
+      accent: "text-indigo-600",
     },
     {
       icon: Award,
-      title: "Hackathons",
-      desc: "Discover & register for hackathons with live countdowns",
+      title: "Hackathons & Contests",
+      desc: "Discover & register for upcoming hackathons with live real-time countdowns.",
+      accent: "text-blue-600",
     },
     {
       icon: Briefcase,
-      title: "Internships",
-      desc: "Find internship opportunities with stipend details",
+      title: "Internships Hub",
+      desc: "Find verified internship opportunities with stipend insights and one-click tracking.",
+      accent: "text-emerald-600",
     },
     {
       icon: GraduationCap,
-      title: "Courses",
-      desc: "Enroll in courses and track your progress",
+      title: "Skill & Course Tracks",
+      desc: "Enroll in curated certifications and monitor your academic progress seamlessly.",
+      accent: "text-violet-600",
     },
     {
       icon: TrendingUp,
-      title: "AI Analytics",
-      desc: "Get AI-generated insights & progress reports",
+      title: "AI Progress Analytics",
+      desc: "Get intelligent AI-generated student reports and PowerPoint summaries.",
+      accent: "text-amber-600",
     },
     {
       icon: Users,
-      title: "Student Monitoring",
-      desc: "Track registrations, completions, and impositions",
+      title: "Real-time Monitoring",
+      desc: "Comprehensive department oversight on completions, registrations, and milestones.",
+      accent: "text-rose-600",
     },
   ];
 
   return (
-    <div className="min-h-screen relative">
+    <div className="min-h-screen relative overflow-x-hidden">
       <AnimatedBackground />
 
-      {/* Navbar */}
-      <nav className="sticky top-0 z-50 backdrop-blur-lg bg-dark-900/80 border-b border-white/10">
-        <div className="container mx-auto px-4 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-secondary-500 flex items-center justify-center shadow-glow">
+      {/* Floating Neumorphic Navbar */}
+      <header className="container mx-auto px-4 pt-4">
+        <nav className="neu-card p-3.5 px-6 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-primary-600 flex items-center justify-center shadow-neu-flat-sm">
               <ShieldCheck className="w-5 h-5 text-white" />
             </div>
             <div>
-              <div className="font-bold text-white leading-tight">CSE(AIML) Monitor</div>
-              <div className="text-[10px] text-dark-400">Student Monitoring System</div>
+              <div className="font-extrabold text-dark-800 leading-tight text-base tracking-tight">CSE(AIML) Monitor</div>
+              <div className="text-[11px] font-semibold text-dark-400">Department of Computer Science & AIML</div>
             </div>
           </div>
-          <Link to="/login/student" className="btn-primary">
-            Login
-          </Link>
-        </div>
-      </nav>
+          <div className="flex items-center gap-3">
+            <Link to="/login/admin" className="hidden sm:inline-flex btn-secondary py-2 px-4 text-xs font-semibold">
+              Admin Portal
+            </Link>
+            <Link to="/login/student" className="btn-primary py-2 px-5 text-xs font-semibold">
+              Login / Sign Up
+            </Link>
+          </div>
+        </nav>
+      </header>
 
-      {/* Hero */}
-      <div className="container mx-auto px-4 py-20 text-center">
+      {/* Hero Section */}
+      <section className="container mx-auto px-4 pt-16 pb-20 text-center">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#e0e5ec] shadow-neu-inset-sm text-xs font-bold text-indigo-600 mb-8 border border-white/70"
+        >
+          <Sparkles className="w-3.5 h-3.5" />
+          <span>Next-Gen Student Performance & Monitoring System</span>
+        </motion.div>
+
         <motion.h1
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-5xl md:text-6xl font-bold text-white mb-6 bg-gradient-to-r from-primary-400 via-secondary-400 to-primary-400 bg-clip-text text-transparent"
+          className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-dark-800 mb-6 tracking-tight max-w-4xl mx-auto"
         >
-          CSE(AIML) Student
-          <br />
-          Monitoring System
+          Elevate Your Academic & Coding Journey in{" "}
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-primary-500 to-indigo-700">
+            CSE(AIML)
+          </span>
         </motion.h1>
 
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="text-lg text-dark-400 mb-12 max-w-2xl mx-auto"
+          transition={{ delay: 0.15 }}
+          className="text-base sm:text-lg text-dark-500 mb-10 max-w-2xl mx-auto leading-relaxed"
         >
-          Track daily LeetCode challenges, hackathons, internships, and courses — all in one place.
-          With AI-powered analytics and real-time monitoring.
+          An integrated platform for tracking daily LeetCode challenges, hackathons, internships, and skill courses with real-time analytics and faculty oversight.
         </motion.p>
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-          className="flex gap-4 justify-center mb-20"
+          transition={{ delay: 0.3 }}
+          className="flex flex-wrap gap-4 justify-center mb-20"
         >
-          <Link to="/login/student" className="btn-primary px-8 py-3 text-lg">
-            Student Login / Register
+          <Link to="/login/student" className="btn-primary px-8 py-3.5 text-base shadow-neu-glow flex items-center gap-2">
+            <span>Student Login / Register</span>
+            <ArrowRight className="w-4 h-4" />
           </Link>
-          <Link to="/login/admin" className="btn-secondary px-8 py-3 text-lg">
-            Admin Login
+          <Link to="/login/admin" className="btn-secondary px-8 py-3.5 text-base">
+            Faculty / Admin Login
           </Link>
         </motion.div>
 
         {/* Features Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto text-left">
           {features.map((feature, i) => (
             <motion.div
               key={feature.title}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 * i }}
-              className="glass-card p-6 hover:shadow-glow transition-all duration-300"
+              transition={{ delay: 0.08 * i }}
+              className="neu-card p-7 hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between"
             >
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary-500 to-secondary-500 flex items-center justify-center mb-4">
-                <feature.icon className="w-6 h-6 text-white" />
+              <div>
+                <div className="w-12 h-12 rounded-2xl bg-[#e0e5ec] shadow-neu-flat-sm flex items-center justify-center mb-5 border border-white/80">
+                  <feature.icon className={`w-6 h-6 ${feature.accent}`} />
+                </div>
+                <h3 className="text-lg font-bold text-dark-800 mb-2.5">{feature.title}</h3>
+                <p className="text-sm text-dark-500 leading-relaxed">{feature.desc}</p>
               </div>
-              <h3 className="text-lg font-semibold text-white mb-2">{feature.title}</h3>
-              <p className="text-sm text-dark-400">{feature.desc}</p>
             </motion.div>
           ))}
         </div>
-      </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="container mx-auto px-4 py-8 text-center border-t border-white/60">
+        <p className="text-xs text-dark-400 font-medium">
+          © {new Date().getFullYear()} CSE(AIML) Student Monitoring System. Designed with Soft UI.
+        </p>
+      </footer>
     </div>
   );
 }

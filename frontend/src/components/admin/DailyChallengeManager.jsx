@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Code2, Trash2, Loader, Edit2 } from "lucide-react";
+import { Code2, Trash2, Edit2, Plus, Sparkles } from "lucide-react";
 import api from "../../api/client";
 import endpoints from "../../api/endpoints";
 import { useToast } from "../../context/ToastContext";
+import Loader from "../common/Loader";
 
 const emptyForm = {
   leetcodeNumber: "",
@@ -49,10 +50,10 @@ export default function DailyChallengeManager() {
 
       if (editing) {
         const { data } = await api.put(endpoints.dailyChallengeById(editing), payload);
-        toast.success(data.message || "Challenge updated!");
+        toast.success(data.message || "Challenge updated successfully!");
       } else {
         const { data } = await api.post(endpoints.createDailyChallenge, payload);
-        toast.success(data.message || "Challenge created!");
+        toast.success(data.message || "Daily Challenge published!");
       }
       setFormData(emptyForm);
       setEditing(null);
@@ -89,20 +90,28 @@ export default function DailyChallengeManager() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
+      {/* Editor Card */}
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 15 }}
         animate={{ opacity: 1, y: 0 }}
-        className="glass-card p-6"
+        className="neu-card p-6 md:p-8"
       >
-        <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-          <Code2 className="w-5 h-5 text-primary-400" />
-          {editing ? "Edit Daily Challenge" : "Create Daily LeetCode Challenge"}
-        </h2>
-
-        <form onSubmit={handleSubmit} className="grid md:grid-cols-5 gap-4 items-end">
+        <div className="flex items-center gap-3 mb-5">
+          <div className="w-10 h-10 rounded-xl bg-[#e0e5ec] shadow-neu-flat-sm flex items-center justify-center border border-white/80 shrink-0">
+            <Code2 className="w-5 h-5 text-indigo-600" />
+          </div>
           <div>
-            <label className="label-dark">Question #</label>
+            <h2 className="text-xl font-extrabold text-dark-800 tracking-tight">
+              {editing ? "Modify Scheduled Challenge" : "Publish Daily LeetCode Problem"}
+            </h2>
+            <p className="text-xs text-dark-400 font-semibold">Title and problem metadata will be fetched automatically.</p>
+          </div>
+        </div>
+
+        <form onSubmit={handleSubmit} className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
+          <div>
+            <label className="label-dark">LeetCode Question #</label>
             <input
               type="number"
               name="leetcodeNumber"
@@ -110,83 +119,104 @@ export default function DailyChallengeManager() {
               min="1"
               value={formData.leetcodeNumber}
               onChange={handleChange}
-              className="input-dark"
-              placeholder="e.g., 123"
+              className="neu-input"
+              placeholder="e.g. 1"
             />
           </div>
           <div>
-            <label className="label-dark">Start Time</label>
+            <label className="label-dark">Start Window</label>
             <input
               type="datetime-local"
               name="startTime"
               required
               value={formData.startTime}
               onChange={handleChange}
-              className="input-dark"
+              className="neu-input"
             />
           </div>
           <div>
-            <label className="label-dark">End Time</label>
+            <label className="label-dark">Submission Deadline</label>
             <input
               type="datetime-local"
               name="endTime"
               required
               value={formData.endTime}
               onChange={handleChange}
-              className="input-dark"
+              className="neu-input"
             />
           </div>
-          <button type="submit" disabled={submitting} className="btn-primary py-2.5">
-            {submitting ? "Saving..." : editing ? "Update" : "Create"}
-          </button>
-          {editing && (
-            <button
-              type="button"
-              onClick={() => { setEditing(null); setFormData(emptyForm); }}
-              className="btn-secondary py-2.5"
-            >
-              Cancel
+          <div className="flex gap-2">
+            <button type="submit" disabled={submitting} className="btn-primary flex-1 py-3 text-xs font-bold disabled:opacity-50">
+              {submitting ? "Saving..." : editing ? "Save Update" : "Deploy Challenge"}
             </button>
-          )}
+            {editing && (
+              <button
+                type="button"
+                onClick={() => { setEditing(null); setFormData(emptyForm); }}
+                className="btn-secondary px-4 py-3 text-xs font-bold"
+              >
+                Cancel
+              </button>
+            )}
+          </div>
         </form>
       </motion.div>
 
-      <div className="glass-card p-6">
-        <h2 className="text-xl font-bold text-white mb-4">Challenge History</h2>
+      {/* History Table Card */}
+      <div className="neu-card p-6 md:p-8">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-lg font-extrabold text-dark-800">Challenge Archives & Submissions</h2>
+          <span className="text-xs font-bold text-dark-400">{challenges.length} Total Records</span>
+        </div>
+
         {loading ? (
-          <div className="flex justify-center py-8">
-            <Loader className="w-8 h-8 animate-spin text-primary-400" />
+          <div className="flex justify-center py-12">
+            <Loader size="md" text="Loading challenges..." />
           </div>
         ) : challenges.length === 0 ? (
-          <p className="text-center text-dark-400 py-8">No challenges created yet</p>
+          <div className="text-center py-10 neu-inset-panel p-6 text-dark-400 font-semibold text-xs">
+            No daily challenges published yet.
+          </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+            <table className="w-full text-xs">
               <thead>
-                <tr className="border-b border-white/10">
-                  <th className="py-2 px-3 text-left text-dark-300"></th>
-                  <th className="py-2 px-3 text-left text-dark-300">Title</th>
-                  <th className="py-2 px-3 text-left text-dark-300">Start</th>
-                  <th className="py-2 px-3 text-left text-dark-300">End</th>
-                  <th className="py-2 px-3 text-left text-dark-300">Completed</th>
-                  <th className="py-2 px-3 text-left text-dark-300">Actions</th>
+                <tr className="border-b border-dark-300/40 text-dark-400 uppercase tracking-wider font-extrabold text-[11px]">
+                  <th className="py-3 px-3 text-left"># Problem</th>
+                  <th className="py-3 px-3 text-left">Title</th>
+                  <th className="py-3 px-3 text-left">Window Start</th>
+                  <th className="py-3 px-3 text-left">Deadline</th>
+                  <th className="py-3 px-3 text-center">Submissions</th>
+                  <th className="py-3 px-3 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="divide-y divide-dark-200/30">
                 {challenges.map((challenge) => (
-                  <tr key={challenge.id} className="border-b border-white/5 hover:bg-white/5">
-                    <td className="py-2 px-3 text-white">{challenge.leetcodeNumber}</td>
-                    <td className="py-2 px-3 text-dark-200">{challenge.leetcodeTitle}</td>
-                    <td className="py-2 px-3 text-dark-300">{new Date(challenge.startTime).toLocaleString()}</td>
-                    <td className="py-2 px-3 text-dark-300">{new Date(challenge.endTime).toLocaleString()}</td>
-                    <td className="py-2 px-3 text-green-400">{challenge.totalCompletions}</td>
-                    <td className="py-2 px-3">
-                      <div className="flex gap-2">
-                        <button onClick={() => handleEdit(challenge)} className="p-1 rounded hover:bg-white/10 text-primary-400">
-                          <Edit2 className="w-4 h-4" />
+                  <tr key={challenge.id} className="hover:bg-white/40 transition-colors">
+                    <td className="py-3.5 px-3 font-mono font-extrabold text-indigo-700">#{challenge.leetcodeNumber}</td>
+                    <td className="py-3.5 px-3 font-bold text-dark-800">{challenge.leetcodeTitle || "—"}</td>
+                    <td className="py-3.5 px-3 text-dark-500 font-medium">{new Date(challenge.startTime).toLocaleString()}</td>
+                    <td className="py-3.5 px-3 text-dark-500 font-medium">{new Date(challenge.endTime).toLocaleString()}</td>
+                    <td className="py-3.5 px-3 text-center">
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-emerald-500/15 text-emerald-700 border border-emerald-500/20 shadow-neu-inset-sm">
+                        {challenge.totalCompletions || 0} solved
+                      </span>
+                    </td>
+                    <td className="py-3.5 px-3 text-right">
+                      <div className="inline-flex items-center gap-1.5">
+                        <button
+                          onClick={() => handleEdit(challenge)}
+                          className="p-2 rounded-xl text-dark-500 hover:text-indigo-600 hover:shadow-neu-btn active:shadow-neu-inset transition-all"
+                          title="Edit Challenge"
+                        >
+                          <Edit2 className="w-3.5 h-3.5" />
                         </button>
-                        <button onClick={() => handleDelete(challenge.id)} className="p-1 rounded hover:bg-red-500/10 text-red-400">
-                          <Trash2 className="w-4 h-4" />
+                        <button
+                          onClick={() => handleDelete(challenge.id)}
+                          className="p-2 rounded-xl text-dark-500 hover:text-red-600 hover:shadow-neu-btn active:shadow-neu-inset transition-all"
+                          title="Delete Challenge"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
                         </button>
                       </div>
                     </td>

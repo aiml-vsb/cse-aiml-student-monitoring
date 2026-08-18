@@ -75,43 +75,43 @@ export default function VerifyOTP() {
     const result = await sendOtp(email);
     setResending(false);
     if (result.success) {
-      toast.success("OTP resent!");
+      toast.success("OTP resent successfully!");
     } else {
       toast.error(result.message);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center relative">
+    <div className="min-h-screen flex items-center justify-center relative p-4">
       <AnimatedBackground />
 
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="glass-card p-8 w-full max-w-md mx-4"
+        className="neu-card p-8 sm:p-10 w-full max-w-md my-8 relative z-10"
       >
         <button
           onClick={() => navigate("/login")}
-          className="inline-flex items-center gap-2 text-dark-400 hover:text-white mb-6"
+          className="inline-flex items-center gap-1.5 text-xs font-bold text-dark-500 hover:text-indigo-600 mb-6 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
           Change Email
         </button>
 
-        <div className="flex items-center justify-center mb-6">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary-500 to-secondary-500 flex items-center justify-center shadow-glow">
-            <ShieldCheck className="w-8 h-8 text-white" />
+        <div className="flex items-center justify-center mb-5">
+          <div className="w-16 h-16 rounded-2xl bg-[#e0e5ec] shadow-neu-flat flex items-center justify-center border border-white/80">
+            <ShieldCheck className="w-8 h-8 text-indigo-600" />
           </div>
         </div>
 
-        <h1 className="text-2xl font-bold text-center text-white mb-2">Verify Email</h1>
-        <p className="text-center text-dark-400 mb-8">
-          Enter the 6-digit code sent to:<br />
-          <span className="text-primary-400 font-semibold">{email}</span>
+        <h1 className="text-2xl font-extrabold text-center text-dark-800 mb-1.5 tracking-tight">Verify Email</h1>
+        <p className="text-center text-xs text-dark-500 mb-8 leading-relaxed">
+          Enter the 6-digit verification code sent to:<br />
+          <span className="text-indigo-600 font-bold">{email}</span>
         </p>
 
         <form onSubmit={handleSubmit}>
-          <div className="flex gap-2 justify-center mb-6">
+          <div className="flex gap-2 sm:gap-2.5 justify-center mb-8">
             {otp.map((digit, index) => (
               <input
                 key={index}
@@ -123,7 +123,7 @@ export default function VerifyOTP() {
                 onChange={(e) => handleChange(index, e.target.value)}
                 onKeyDown={(e) => handleKeyDown(index, e)}
                 onPaste={handlePaste}
-                className="w-12 h-14 text-center text-2xl font-bold bg-dark-800 border border-dark-600 rounded-lg focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500 transition-colors"
+                className="w-11 h-14 sm:w-12 sm:h-14 text-center text-2xl font-mono font-extrabold bg-[#e0e5ec] text-dark-800 rounded-xl shadow-neu-inset border border-white/60 focus:outline-none focus:shadow-neu-inset-deep focus:border-indigo-400 focus:text-indigo-600 transition-all"
               />
             ))}
           </div>
@@ -131,19 +131,19 @@ export default function VerifyOTP() {
           <button
             type="submit"
             disabled={loading || otp.some((d) => !d)}
-            className="btn-primary w-full py-3 disabled:opacity-50"
+            className="btn-primary w-full py-3.5 text-sm font-bold disabled:opacity-50"
           >
-            {loading ? "Verifying..." : "Verify & Login"}
+            {loading ? "Verifying..." : "Verify & Continue"}
           </button>
         </form>
 
         <button
           onClick={handleResend}
           disabled={resending}
-          className="w-full flex items-center justify-center gap-2 text-dark-400 hover:text-primary-400 mt-4 py-2 disabled:opacity-50"
+          className="w-full flex items-center justify-center gap-2 text-xs font-bold text-dark-400 hover:text-indigo-600 mt-5 py-2 disabled:opacity-50 transition-colors"
         >
-          <RefreshCw className={`w-4 h-4 ${resending ? "animate-spin" : ""}`} />
-          {resending ? "Resending..." : "Resend OTP"}
+          <RefreshCw className={`w-3.5 h-3.5 ${resending ? "animate-spin text-indigo-600" : ""}`} />
+          {resending ? "Dispatching code..." : "Resend code"}
         </button>
       </motion.div>
     </div>

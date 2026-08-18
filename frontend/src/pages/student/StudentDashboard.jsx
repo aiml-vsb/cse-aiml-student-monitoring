@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Code2, Trophy, Briefcase, GraduationCap, Loader, History } from "lucide-react";
+import { Code2, Trophy, Briefcase, GraduationCap, History, Sparkles } from "lucide-react";
 import Navbar from "../../components/common/Navbar";
 import AnimatedBackground from "../../components/common/AnimatedBackground";
 import DailyChallengeCard from "../../components/student/DailyChallengeCard";
@@ -8,6 +8,7 @@ import InternshipCard from "../../components/student/InternshipCard";
 import CourseCard from "../../components/student/CourseCard";
 import ChallengeHistory from "../../components/student/ChallengeHistory";
 import ProfileSetupModal from "../../components/student/ProfileSetupModal";
+import Loader from "../../components/common/Loader";
 import api from "../../api/client";
 import endpoints from "../../api/endpoints";
 import { useAuth } from "../../context/AuthContext";
@@ -70,21 +71,21 @@ export default function StudentDashboard() {
       label: "Hackathons",
       count: hackathons.length,
       icon: Trophy,
-      iconClass: "text-secondary-400",
+      iconClass: "text-indigo-600",
     },
     {
       id: "internships",
       label: "Internships",
       count: internships.length,
       icon: Briefcase,
-      iconClass: "text-green-400",
+      iconClass: "text-emerald-600",
     },
     {
       id: "courses",
       label: "Courses",
       count: courses.length,
       icon: GraduationCap,
-      iconClass: "text-primary-400",
+      iconClass: "text-violet-600",
     },
   ];
 
@@ -92,14 +93,22 @@ export default function StudentDashboard() {
     if (selectedCategory === "hackathons") {
       return (
         <section>
-          <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-            <Trophy className="w-5 h-5 text-secondary-400" />
-            Hackathons
-          </h2>
+          <div className="flex items-center justify-between mb-5">
+            <h2 className="text-xl font-extrabold text-dark-800 flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-xl bg-[#e0e5ec] shadow-neu-flat-sm flex items-center justify-center border border-white/80">
+                <Trophy className="w-4 h-4 text-indigo-600" />
+              </div>
+              <span>Hackathons & Competitions</span>
+            </h2>
+            <span className="text-xs font-bold text-dark-400">{hackathons.length} Available</span>
+          </div>
+
           {hackathons.length === 0 ? (
-            <p className="text-dark-400">No hackathons available.</p>
+            <div className="neu-card p-8 text-center text-dark-400 text-sm font-semibold">
+              No hackathons published yet. Check back soon!
+            </div>
           ) : (
-            <div className="grid md:grid-cols-2 gap-8 max-w-4xl">
+            <div className="grid md:grid-cols-2 gap-7">
               {hackathons.map((hackathon) => (
                 <HackathonCard
                   key={hackathon.id}
@@ -118,14 +127,22 @@ export default function StudentDashboard() {
     if (selectedCategory === "internships") {
       return (
         <section>
-          <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-            <Briefcase className="w-5 h-5 text-green-400" />
-            Internships
-          </h2>
+          <div className="flex items-center justify-between mb-5">
+            <h2 className="text-xl font-extrabold text-dark-800 flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-xl bg-[#e0e5ec] shadow-neu-flat-sm flex items-center justify-center border border-white/80">
+                <Briefcase className="w-4 h-4 text-emerald-600" />
+              </div>
+              <span>Verified Internships</span>
+            </h2>
+            <span className="text-xs font-bold text-dark-400">{internships.length} Available</span>
+          </div>
+
           {internships.length === 0 ? (
-            <p className="text-dark-400">No internships available.</p>
+            <div className="neu-card p-8 text-center text-dark-400 text-sm font-semibold">
+              No internship listings available right now.
+            </div>
           ) : (
-            <div className="grid md:grid-cols-2 gap-8 max-w-4xl">
+            <div className="grid md:grid-cols-2 gap-7">
               {internships.map((internship) => (
                 <InternshipCard
                   key={internship.id}
@@ -143,14 +160,22 @@ export default function StudentDashboard() {
 
     return (
       <section>
-        <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-          <GraduationCap className="w-5 h-5 text-primary-400" />
-          Courses
-        </h2>
+        <div className="flex items-center justify-between mb-5">
+          <h2 className="text-xl font-extrabold text-dark-800 flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-xl bg-[#e0e5ec] shadow-neu-flat-sm flex items-center justify-center border border-white/80">
+              <GraduationCap className="w-4 h-4 text-violet-600" />
+            </div>
+            <span>Academic & Industry Courses</span>
+          </h2>
+          <span className="text-xs font-bold text-dark-400">{courses.length} Available</span>
+        </div>
+
         {courses.length === 0 ? (
-          <p className="text-dark-400">No courses available.</p>
+          <div className="neu-card p-8 text-center text-dark-400 text-sm font-semibold">
+            No courses enrolled or open at this moment.
+          </div>
         ) : (
-          <div className="grid md:grid-cols-2 gap-8 max-w-4xl">
+          <div className="grid md:grid-cols-2 gap-7">
             {courses.map((course) => (
               <CourseCard
                 key={course.id}
@@ -170,7 +195,7 @@ export default function StudentDashboard() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <AnimatedBackground />
-        <Loader className="w-10 h-10 animate-spin text-primary-400" />
+        <Loader size="lg" text="Loading student dashboard..." />
       </div>
     );
   }
@@ -180,18 +205,25 @@ export default function StudentDashboard() {
       <AnimatedBackground />
       <Navbar />
 
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-white">
-            Welcome, {user?.username || "Student"}! 👋
-          </h1>
+      <div className="container mx-auto px-4 py-8 max-w-7xl">
+        <div className="flex flex-wrap justify-between items-center gap-4 mb-8">
+          <div>
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#e0e5ec] shadow-neu-inset-sm text-[11px] font-extrabold text-indigo-600 mb-2 border border-white/60">
+              <Sparkles className="w-3 h-3" />
+              <span>Student Overview & Milestones</span>
+            </div>
+            <h1 className="text-3xl font-extrabold text-dark-800 tracking-tight">
+              Welcome back, {user?.username || "Student"}! 👋
+            </h1>
+          </div>
         </div>
 
-        <div className="grid lg:grid-cols-4 gap-6">
+        <div className="grid lg:grid-cols-4 gap-7">
+          {/* Left Column: Challenge History & Segmented Nav */}
           <aside className="lg:col-span-1 space-y-6">
-            <div className="glass-card p-4 sticky top-20 max-h-80 flex flex-col">
-              <h2 className="text-lg font-bold text-white mb-3 flex items-center gap-2 flex-shrink-0">
-                <History className="w-4 h-4 text-secondary-400" />
+            <div className="neu-card p-5 sticky top-24 max-h-80 flex flex-col">
+              <h2 className="text-sm font-extrabold text-dark-800 mb-3 flex items-center gap-2 flex-shrink-0">
+                <History className="w-4 h-4 text-indigo-600" />
                 Challenge History
               </h2>
               <div className="flex-1 overflow-hidden">
@@ -199,40 +231,42 @@ export default function StudentDashboard() {
               </div>
             </div>
 
-            <div className="glass-card p-4 sticky top-96">
-              <h2 className="text-lg font-bold text-white mb-3">Registrations</h2>
-              <div className="space-y-2">
-                {categoryMeta.map(({ id, label, count, icon: Icon, iconClass }) => (
-                  <button
-                    key={id}
-                    type="button"
-                    onClick={() => setSelectedCategory(id)}
-                    className={`w-full flex items-center justify-between rounded-xl border px-3 py-2 text-left transition ${
-                      selectedCategory === id
-                        ? "border-primary-500/60 bg-primary-500/10 text-white"
-                        : "border-white/10 bg-white/5 text-dark-300 hover:bg-white/10"
-                    }`}
-                  >
-                    <span className="flex items-center gap-2">
-                      <Icon className={`w-4 h-4 ${iconClass}`} />
-                      {label}
-                    </span>
-                    <span className="rounded-full bg-black/20 px-2 py-0.5 text-xs font-semibold text-white">
-                      {count}
-                    </span>
-                  </button>
-                ))}
+            <div className="neu-card p-5 sticky top-[25rem]">
+              <h2 className="text-sm font-extrabold text-dark-800 mb-3">Opportunities</h2>
+              <div className="space-y-2.5">
+                {categoryMeta.map(({ id, label, count, icon: Icon, iconClass }) => {
+                  const isSelected = selectedCategory === id;
+                  return (
+                    <button
+                      key={id}
+                      type="button"
+                      onClick={() => setSelectedCategory(id)}
+                      className={`w-full flex items-center justify-between rounded-xl px-3.5 py-2.5 text-left text-xs font-bold transition-all duration-200 ${
+                        isSelected
+                          ? "bg-[#e0e5ec] text-indigo-600 shadow-neu-flat-sm border border-white/80"
+                          : "text-dark-500 hover:text-dark-800 hover:bg-white/30"
+                      }`}
+                    >
+                      <span className="flex items-center gap-2.5">
+                        <Icon className={`w-4 h-4 ${isSelected ? "text-indigo-600" : iconClass}`} />
+                        {label}
+                      </span>
+                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold ${
+                        isSelected ? "bg-indigo-600 text-white shadow-sm" : "bg-[#e0e5ec] shadow-neu-inset-sm text-dark-500"
+                      }`}>
+                        {count}
+                      </span>
+                    </button>
+                  );
+                })}
               </div>
             </div>
           </aside>
 
+          {/* Right Column: Challenge of the day and selected category */}
           <main className="lg:col-span-3 space-y-8">
             {activeChallenge?.active && activeChallenge?.status !== "COMPLETED" && (
               <section>
-                <h2 className="text-lg font-bold text-white mb-3 flex items-center gap-2">
-                  <Code2 className="w-4 h-4 text-primary-400" />
-                  LeetCode for the Day
-                </h2>
                 <DailyChallengeCard
                   challenge={activeChallenge.challenge}
                   status={activeChallenge.status}

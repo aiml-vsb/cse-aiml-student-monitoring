@@ -8,26 +8,48 @@ export function ToastProvider({ children }) {
     const toastOptions = {
       duration: 4000,
       style: {
-        borderRadius: "12px",
-        background: "#1e293b",
-        color: "#fff",
-        boxShadow: "0 4px 20px rgba(0,0,0,0.5)",
+        borderRadius: "16px",
+        background: "#e0e5ec",
+        color: "#2d3748",
+        fontWeight: 600,
+        fontSize: "0.875rem",
+        padding: "12px 18px",
+        border: "1px solid rgba(255, 255, 255, 0.8)",
+        boxShadow: "8px 8px 16px #bcc5d4, -8px -8px 16px #ffffff",
       },
       ...options,
     };
 
     switch (type) {
       case "success":
-        toast.success(message, toastOptions);
+        toast.success(message, {
+          ...toastOptions,
+          iconTheme: {
+            primary: "#10b981",
+            secondary: "#ffffff",
+          },
+        });
         break;
       case "error":
-        toast.error(message, { ...toastOptions, style: { ...toastOptions.style, background: "#7f1d1d" } });
+        toast.error(message, {
+          ...toastOptions,
+          iconTheme: {
+            primary: "#ef4444",
+            secondary: "#ffffff",
+          },
+        });
         break;
       case "info":
-        toast(message, { ...toastOptions, icon: "ℹ️" });
+        toast(message, {
+          ...toastOptions,
+          icon: "ℹ️",
+        });
         break;
       case "warning":
-        toast(message, { ...toastOptions, icon: "⚠️", style: { ...toastOptions.style, background: "#713f12" } });
+        toast(message, {
+          ...toastOptions,
+          icon: "⚠️",
+        });
         break;
       default:
         toast(message, toastOptions);

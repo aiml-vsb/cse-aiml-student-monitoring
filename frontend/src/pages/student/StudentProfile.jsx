@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { User, Calendar, Code2, Github, Save, Loader, ArrowLeft } from "lucide-react";
+import { User, Calendar, Code2, Github, Save, Loader2, ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../../components/common/Navbar";
 import AnimatedBackground from "../../components/common/AnimatedBackground";
+import Loader from "../../components/common/Loader";
 import api from "../../api/client";
 import endpoints from "../../api/endpoints";
 import { useAuth } from "../../context/AuthContext";
@@ -116,7 +117,7 @@ export default function StudentProfile() {
     try {
       const { data } = await api.put(endpoints.updateStudentProfile, formData);
       updateUser(data.data);
-      toast.success("Profile updated!");
+      toast.success("Profile updated successfully!");
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to update profile");
     } finally {
@@ -139,7 +140,7 @@ export default function StudentProfile() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <AnimatedBackground />
-        <Loader className="w-8 h-8 animate-spin text-primary-400" />
+        <Loader size="lg" text="Loading profile details..." />
       </div>
     );
   }
@@ -152,7 +153,7 @@ export default function StudentProfile() {
       <div className="container max-w-2xl mx-auto px-4 py-8">
         <button
           onClick={() => navigate("/student")}
-          className="flex items-center gap-1 text-dark-300 hover:text-white mb-4 text-sm"
+          className="flex items-center gap-1.5 text-xs font-bold text-dark-500 hover:text-indigo-600 mb-6 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
           Back to Dashboard
@@ -161,41 +162,48 @@ export default function StudentProfile() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="glass-card p-8"
+          className="neu-card p-8 md:p-10 shadow-neu-flat-lg border border-white/80"
         >
-          <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
-            <User className="w-6 h-6 text-primary-400" />
-            My Profile
-          </h2>
-
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="flex items-center gap-3 mb-6 pb-4 border-b border-white/60">
+            <div className="w-12 h-12 rounded-2xl bg-[#e0e5ec] shadow-neu-flat flex items-center justify-center border border-white/80 shrink-0">
+              <User className="w-6 h-6 text-indigo-600" />
+            </div>
             <div>
-              <label className="label-dark">Username</label>
+              <h2 className="text-2xl font-extrabold text-dark-800 tracking-tight">
+                My Student Profile
+              </h2>
+              <p className="text-xs text-dark-400 font-semibold">Manage your LeetCode and GitHub verified handles.</p>
+            </div>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <div>
+              <label className="label-dark">Full Name / Username</label>
               <div className="relative">
-                <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-dark-500" />
+                <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-dark-400 pointer-events-none" />
                 <input
                   type="text"
                   name="username"
                   required
                   value={formData.username}
                   onChange={handleChange}
-                  className="input-dark pl-9"
+                  className="neu-input pl-10"
                 />
               </div>
             </div>
 
             <div>
-              <label className="label-dark">Year</label>
+              <label className="label-dark">Academic Year</label>
               <div className="relative">
-                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-dark-500" />
+                <Calendar className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-dark-400 pointer-events-none" />
                 <select
                   name="year"
                   required
                   value={formData.year}
                   onChange={handleChange}
-                  className="input-dark pl-9"
+                  className="neu-input pl-10"
                 >
-                  <option value="">Select Year</option>
+                  <option value="">Select Academic Year</option>
                   <option value="1st Year">1st Year</option>
                   <option value="2nd Year">2nd Year</option>
                   <option value="3rd Year">3rd Year</option>
@@ -205,63 +213,60 @@ export default function StudentProfile() {
             </div>
 
             <div>
-              <label className="label-dark">LeetCode Username or URL</label>
+              <label className="label-dark">LeetCode Username or Profile URL</label>
               <div className="relative">
-                <Code2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-dark-500" />
+                <Code2 className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-dark-400 pointer-events-none" />
                 <input
                   type="text"
                   name="leetcodeUsername"
                   required
                   value={formData.leetcodeUsername}
                   onChange={handleChange}
-                  className="input-dark pl-9"
+                  className="neu-input pl-10"
                   placeholder="e.g., johndoe or https://leetcode.com/u/johndoe/"
                 />
               </div>
-              <p className="text-xs text-dark-400 mt-1">
-                Your LeetCode profile must be public for verification; you can paste the profile URL.
+              <p className="text-[11px] text-dark-400 font-medium mt-1">
+                Your profile must be publicly accessible for automated LeetCode verification.
               </p>
             </div>
 
             <div>
-              <label className="label-dark">GitHub Username or URL</label>
+              <label className="label-dark">GitHub Username or Profile URL</label>
               <div className="relative">
-                <Github className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-dark-500" />
+                <Github className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-dark-400 pointer-events-none" />
                 <input
                   type="text"
                   name="githubUsername"
                   required
                   value={formData.githubUsername}
                   onChange={handleChange}
-                  className="input-dark pl-9"
+                  className="neu-input pl-10"
                   placeholder="e.g., johndoe or https://github.com/johndoe"
                 />
               </div>
-              <p className="text-xs text-dark-400 mt-1">
-                You can paste your GitHub profile URL and we will extract the username.
-              </p>
             </div>
 
-            <div className="flex flex-col gap-2">
+            <div className="pt-2 flex flex-col gap-3">
               <button
                 type="button"
                 onClick={handleGithubLink}
                 disabled={saving || linking}
-                className="btn-secondary w-full py-3"
+                className="btn-secondary w-full py-3 text-xs font-bold flex items-center justify-center gap-2"
               >
                 {linking ? (
-                  <Loader className="w-4 h-4 animate-spin mr-2" />
+                  <Loader2 className="w-4 h-4 animate-spin" />
                 ) : (
-                  <Github className="w-4 h-4 mr-2" />
+                  <Github className="w-4 h-4 text-dark-700" />
                 )}
-                {linking ? "Connecting..." : "Link GitHub via OAuth"}
+                {linking ? "Connecting..." : "Re-authorize GitHub via OAuth"}
+              </button>
+
+              <button type="submit" disabled={saving} className="btn-primary w-full py-3 text-sm font-bold flex items-center justify-center gap-2">
+                {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                {saving ? "Saving Updates..." : "Save Changes"}
               </button>
             </div>
-
-            <button type="submit" disabled={saving} className="btn-primary w-full py-3">
-              {saving ? <Loader className="w-4 h-4 animate-spin mr-2" /> : <Save className="w-4 h-4 mr-2" />}
-              {saving ? "Saving..." : "Save Changes"}
-            </button>
           </form>
         </motion.div>
       </div>

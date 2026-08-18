@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Bell, FileText, CheckCircle, X, Loader } from "lucide-react";
+import { Bell, FileText, CheckCircle, X, Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import api from "../../api/client";
 import endpoints from "../../api/endpoints";
@@ -40,7 +40,7 @@ export default function NotificationsDropdown({ basePath = "/student/tasks" }) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const handleTaskClick = (task) => {
+  const handleTaskClick = () => {
     setOpen(false);
     navigate(basePath);
   };
@@ -49,47 +49,52 @@ export default function NotificationsDropdown({ basePath = "/student/tasks" }) {
     <div ref={dropdownRef} className="relative">
       <button
         onClick={() => setOpen(!open)}
-        className="relative p-2 rounded-lg hover:bg-white/10 text-white transition-colors"
+        className={`relative p-2.5 rounded-xl text-dark-600 transition-all ${
+          open ? "shadow-neu-inset text-indigo-600" : "shadow-neu-btn active:shadow-neu-inset hover:text-dark-800"
+        }`}
       >
-        <Bell className="w-5 h-5" />
+        <Bell className="w-4 h-4" />
         {tasks && tasks.length > 0 && (
-          <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full text-[10px] flex items-center justify-center font-bold">
+          <span className="absolute -top-1 -right-1 w-4 h-4 bg-indigo-600 text-white rounded-full text-[10px] flex items-center justify-center font-bold shadow-sm">
             {tasks.length}
           </span>
         )}
       </button>
 
       {open && (
-        <div className="absolute right-0 mt-2 w-80 glass-card p-4 z-50">
-          <div className="flex justify-between items-center mb-3">
-            <h3 className="text-white font-semibold">Notifications</h3>
-            <button onClick={() => setOpen(false)}>
-              <X className="w-4 h-4 text-dark-300" />
+        <div className="absolute right-0 mt-3 w-80 neu-card p-4 z-50 animate-fade-in border border-white/70">
+          <div className="flex justify-between items-center mb-3 pb-2 border-b border-white/60">
+            <h3 className="text-dark-800 font-bold text-sm">Notifications</h3>
+            <button
+              onClick={() => setOpen(false)}
+              className="p-1 rounded-lg text-dark-400 hover:text-dark-700 shadow-neu-btn active:shadow-neu-inset"
+            >
+              <X className="w-3.5 h-3.5" />
             </button>
           </div>
 
           {loading ? (
-            <div className="flex justify-center py-4">
-              <Loader className="w-6 h-6 animate-spin text-primary-400" />
+            <div className="flex justify-center py-5">
+              <Loader2 className="w-5 h-5 animate-spin text-indigo-600" />
             </div>
           ) : tasks.length === 0 ? (
-            <div className="py-4 text-center text-dark-400">
-              <FileText className="w-8 h-8 mx-auto mb-2 opacity-50" />
+            <div className="py-6 text-center text-dark-400 text-sm">
+              <FileText className="w-7 h-7 mx-auto mb-2 text-dark-300" />
               No notifications yet
             </div>
           ) : (
-            <div className="space-y-2 max-h-80 overflow-y-auto">
+            <div className="space-y-2.5 max-h-80 overflow-y-auto pr-1">
               {tasks.map((task) => (
                 <button
                   key={task.id}
                   onClick={() => handleTaskClick(task)}
-                  className="w-full text-left p-3 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-colors"
+                  className="w-full text-left p-3 rounded-xl bg-[#e0e5ec] shadow-neu-flat-sm hover:shadow-neu-btn transition-all duration-200"
                 >
-                  <div className="flex items-start gap-2">
-                    <CheckCircle className="w-4 h-4 text-green-400 mt-0.5" />
+                  <div className="flex items-start gap-2.5">
+                    <CheckCircle className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" />
                     <div>
-                      <div className="font-semibold text-white text-sm">{task.title}</div>
-                      <p className="text-xs text-dark-400 mt-1 line-clamp-2">{task.description}</p>
+                      <div className="font-semibold text-dark-800 text-xs">{task.title}</div>
+                      <p className="text-[11px] text-dark-500 mt-0.5 line-clamp-2">{task.description}</p>
                     </div>
                   </div>
                 </button>

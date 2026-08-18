@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { CheckCircle, Code2, Loader, BookOpen, Timer } from "lucide-react";
+import { CheckCircle, Code2, Loader2, BookOpen, Timer } from "lucide-react";
 import api from "../../api/client";
 import endpoints from "../../api/endpoints";
 import { useToast } from "../../context/ToastContext";
@@ -32,13 +32,13 @@ function Countdown({ endTime }) {
 
   return (
     <div className="countdown-box">
-      <span className="time-label flex items-center gap-1">
-        <Timer className="w-4 h-4" />
+      <span className="time-label flex items-center gap-1.5">
+        <Timer className="w-3.5 h-3.5 text-indigo-600" />
         Time Remaining
       </span>
-      <span className={`time-value ${expired ? "text-red-400" : ""}`}>{timeLeft}</span>
+      <span className={`time-value ${expired ? "text-red-500" : "text-indigo-600"}`}>{timeLeft}</span>
       {expired && (
-        <span className="text-xs text-red-400 font-medium mt-1">Deadline passed</span>
+        <span className="text-xs text-red-500 font-bold mt-1 tracking-wide">Deadline passed</span>
       )}
     </div>
   );
@@ -62,35 +62,39 @@ export default function DailyChallengeCard({ challenge, status, completedAt, lan
   };
 
   return (
-    <div className="glass-card challenge-card p-4">
-      <div className="grid md:grid-cols-2 gap-4 items-center w-full">
+    <div className="neu-card challenge-card p-6 md:p-8">
+      <div className="grid md:grid-cols-2 gap-6 items-center w-full">
         {/* Left: Problem details */}
         <div>
-          <div className="flex items-center gap-2 mb-2">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary-500 to-secondary-500 flex items-center justify-center shadow-glow">
-              <Code2 className="w-5 h-5 text-white" />
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-12 h-12 rounded-2xl bg-[#e0e5ec] shadow-neu-flat flex items-center justify-center border border-white/80 shrink-0">
+              <Code2 className="w-6 h-6 text-indigo-600" />
             </div>
             <div>
-              <div className="flex items-center gap-2 text-dark-300 text-xs">
-                <BookOpen className="w-3 h-3" />
-                LeetCode Challenge
+              <div className="flex items-center gap-1.5 text-dark-400 text-xs font-semibold uppercase tracking-wider">
+                <BookOpen className="w-3.5 h-3.5" />
+                Daily LeetCode Challenge
               </div>
-              <h3 className="text-lg font-bold text-white">#{challenge.leetcodeNumber}</h3>
+              <h3 className="text-xl font-extrabold text-dark-800 tracking-tight">#{challenge.leetcodeNumber}</h3>
             </div>
           </div>
 
-          <p className="text-sm text-dark-200 mb-2">{challenge.leetcodeTitle}</p>
+          <p className="text-sm font-semibold text-dark-600 mb-4 leading-snug">{challenge.leetcodeTitle}</p>
 
           {status === "COMPLETED" ? (
-            <div className="text-green-400 font-medium flex items-center gap-2 mt-2 text-sm">
-              <CheckCircle className="w-4 h-4" />
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-700 font-bold text-xs">
+              <CheckCircle className="w-4 h-4 text-emerald-600" />
               Completed{language ? ` in ${language}` : ""}
-              {completedAt ? ` · ${new Date(completedAt).toLocaleString()}` : ""}
+              {completedAt ? ` · ${new Date(completedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}` : ""}
             </div>
           ) : status === "NOT_COMPLETED" ? (
-            <div className="text-red-400 font-medium mt-2 text-sm">✗ Not Completed</div>
+            <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-red-500/10 border border-red-500/20 text-red-600 font-bold text-xs">
+              ✗ Not Completed
+            </div>
           ) : (
-            <div className="text-yellow-400 font-medium mt-2 text-sm">● Pending</div>
+            <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-700 font-bold text-xs">
+              ● Pending Submission
+            </div>
           )}  
         </div>
 
@@ -102,10 +106,10 @@ export default function DailyChallengeCard({ challenge, status, completedAt, lan
 
       {/* Action bar */}
       {status !== "COMPLETED" && status !== "NOT_COMPLETED" && (
-        <div className="mt-6 pt-4 border-t border-white/10 flex justify-end">
-          <button onClick={handleComplete} disabled={submitting} className="btn-primary px-8 py-3 text-lg disabled:opacity-50">
-            {submitting ? <Loader className="w-5 h-5 animate-spin mr-2" /> : null}
-            {submitting ? "Verifying..." : "Mark as Completed"}
+        <div className="mt-6 pt-5 border-t border-white/60 flex justify-end">
+          <button onClick={handleComplete} disabled={submitting} className="btn-primary px-8 py-3 text-sm font-bold disabled:opacity-50 flex items-center">
+            {submitting ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+            {submitting ? "Verifying On LeetCode..." : "Mark as Completed"}
           </button>
         </div>
       )}

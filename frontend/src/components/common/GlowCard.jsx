@@ -1,20 +1,13 @@
 import { motion } from "framer-motion";
 
-export default function GlowCard({ children, className = "", glowColor = "primary", delay = 0 }) {
-  const glowClasses = {
-    primary: "hover:shadow-glow",
-    blue: "hover:shadow-glow-blue",
-    green: "hover:shadow-glow-green",
-    red: "hover:shadow-glow-red",
-  };
-
+export default function GlowCard({ children, className = "", delay = 0 }) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, delay }}
-      whileHover={{ y: -4, scale: 1.01 }}
-      className={`glass-card p-6 transition-all duration-300 ${glowClasses[glowColor]} ${className}`}
+      transition={{ duration: 0.35, delay }}
+      whileHover={{ y: -3 }}
+      className={`neu-card p-5 md:p-6 transition-all duration-300 ${className}`}
     >
       {children}
     </motion.div>
